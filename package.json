@@ -4,7 +4,7 @@
   "description": "Lightweight POSIX/GNU option parser and multi-script slash-command router for AI Dungeon and interactive fiction",
   "main": "src/getopt-aid.js",
   "scripts": {
-    "test": "node test/test_getopt_aid.js"
+    "test": "node test/test_getopt_aid.js && node test/test_sandbox.js"
   },
   "keywords": [
     "ai-dungeon",

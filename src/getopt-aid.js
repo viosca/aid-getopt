@@ -36,7 +36,7 @@
 
         let str = input.trim();
         // AID dialogue wrapper: e.g. > You say, "..." or Joe says, "..."
-        const sayMatch = str.match(/(?:^|\n)(?:>\s*)?(?:You|[A-Za-z0-9_]+)\s*(?:says?|asks?|exclaims?|shouts?),?\s*["“]([\s\S]*?)["”]\s*$/i);
+        const sayMatch = str.match(/(?:^|\n)(?:>\s*)?(?:You|[A-Za-z0-9_]+)\s*(?:says?|asks?|exclaims?|shouts?),?\s*["“]([\s\S]*?)["”][\s.!?]*$/i);
         if (sayMatch) {
             str = sayMatch[1].trim();
         }
@@ -373,7 +373,7 @@
 
             let str = input.trim();
             // Dialogue wrapper unpacking (Say/Do mode)
-            const sayMatch = str.match(/(?:^|\n)(?:>\s*)?(?:You|[A-Za-z0-9_]+)\s*(?:says?|asks?|exclaims?|shouts?),?\s*["“]([\s\S]*?)["”]\s*$/i);
+            const sayMatch = str.match(/(?:^|\n)(?:>\s*)?(?:You|[A-Za-z0-9_]+)\s*(?:says?|asks?|exclaims?|shouts?),?\s*["“]([\s\S]*?)["”][\s.!?]*$/i);
             if (sayMatch) {
                 str = sayMatch[1].trim();
             }

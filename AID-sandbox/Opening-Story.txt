@@ -1,0 +1,23 @@
+The cold mountain wind howls across the jagged pass of the Ironridge Range, carrying the sharp scent of cedar and impending snow. Before you stands the heavy oak door of the Crossroads Waystation, its iron lanterns flickering warmly against the twilight.
+
+Inside, the tavern hums with low murmurs, the crackle of a roaring stone hearth, and the rhythmic clinking of flagons. Travelers, mercenaries, and cloaked wanderers huddle around weathered tables, their eyes darting toward each newcomer.
+
+Behind the polished timber bar stands Oakhaven, the scarred barkeep, wiping a wooden mug with a dry cloth. He glances up as you shake the frost from your cloak.
+
+"Welcome to the Crossroads, stranger," Oakhaven rumbles, nodding toward an empty stool by the fire. "Rest your boots, check your pack, and steady your nerves. The mountain roads aren't kind to the unprepared."
+
+You take a seat by the crackling embers and assess your situation.
+
+---
+[GetoptAID Sandbox Active — Try typing these slash commands]:
+* /roll -d 20 -m 3 (Roll dice with modifiers)
+* /roll -d 20 -a (Roll with advantage)
+* /inv -l (View inventory and gold)
+* /inv -a "Steel Dagger" -a "Healing Draught" (Add multiple items)
+* /stat -v (View character sheet)
+* /stat --meta class=Ranger --hp 90 (Set attributes)
+* /help (View full command manual)
+* Dialogue works naturally: You say, "/roll -d 20"
+---
+
+What do you do next?
