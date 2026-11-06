@@ -441,6 +441,157 @@
         return new Router();
     }
 
+    /**
+     * Executes an in-engine self-test suite verifying Layer 1 option parsing,
+     * Layer 2 command routing, mobile normalization, and pipeline passthrough.
+     * Ideal for in-game diagnostic slash commands (e.g. /test) in AI Dungeon.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.verbose=false] Include detailed test descriptions
+     * @returns {{ passed: number, failed: number, total: number, results: Array<{ name: string, passed: boolean, error?: string }>, formatted: string }}
+     */
+    function selfTest(options = {}) {
+        const results = [];
+
+        function run(name, fn) {
+            try {
+                fn();
+                results.push({ name, passed: true });
+            } catch (err) {
+                results.push({ name, passed: false, error: err.message || String(err) });
+            }
+        }
+
+        // Test 1: Short & long boolean flags
+        run("Short & long boolean flags (-v, --help)", () => {
+            const r = getopt("-v --help", { "verbose|v": false, "help|h": false });
+            if (r.flags.verbose !== true || r.flags.help !== true) throw new Error("Flags not set to true");
+        });
+
+        // Test 2: Typed arguments and default values
+        run("Typed arguments (=s, =i) and defaults", () => {
+            const r = getopt("-m raw -c 5", { "mode|m=s": "auto", "count|c=i": 1 });
+            if (r.flags.mode !== "raw") throw new Error(`Expected mode "raw", got "${r.flags.mode}"`);
+            if (r.flags.count !== 5) throw new Error(`Expected count 5, got ${r.flags.count}`);
+        });
+
+        // Test 3: Array accumulator (@)
+        run("Array accumulators (@)", () => {
+            const r = getopt("-t fire -t magic", { "tag|t=s@": [] });
+            if (!Array.isArray(r.flags.tag) || r.flags.tag.length !== 2 || r.flags.tag[0] !== "fire" || r.flags.tag[1] !== "magic") {
+                throw new Error(`Array mismatch: ${JSON.stringify(r.flags.tag)}`);
+            }
+        });
+
+        // Test 4: Hash accumulator (%)
+        run("Hash accumulators (%)", () => {
+            const r = getopt("--meta class=Rogue --meta level=3", { "meta=s%": {} });
+            if (!r.flags.meta || r.flags.meta.class !== "Rogue" || r.flags.meta.level !== "3") {
+                throw new Error(`Hash mismatch: ${JSON.stringify(r.flags.meta)}`);
+            }
+        });
+
+        // Test 5: Incremental counter modifier (+)
+        run("Incremental counter (+)", () => {
+            const r = getopt("-v -v -v", { "verbose|v+": 0 });
+            if (r.flags.verbose !== 3) throw new Error(`Expected 3, got ${r.flags.verbose}`);
+        });
+
+        // Test 6: Mobile smart dashes and curly quotes
+        run("Mobile smart dashes (—, –) and curly quotes (“ ”)", () => {
+            const r = getopt("—mode “epic quest” –c 10", { "mode|m=s": "", "count|c=i": 0 });
+            if (r.flags.mode !== "epic quest") throw new Error(`Smart quote target mismatch: ${r.flags.mode}`);
+            if (r.flags.count !== 10) throw new Error(`Smart dash flag mismatch: ${r.flags.count}`);
+        });
+
+        // Test 7: POSIX '--' delimiter stops option parsing
+        run("POSIX '--' delimiter stops option parsing", () => {
+            const r = getopt("-- -v literalWord", { "verbose|v": false });
+            if (r.flags.verbose !== false) throw new Error("Option parsed after -- delimiter");
+            if (!r.operands.includes("-v")) throw new Error("-v should be literal operand");
+        });
+
+        // Test 8: Layer 2 Router registration & dispatch
+        run("Layer 2 Router dispatch & action routing", () => {
+            const testApp = cli();
+            let actionRan = false;
+            testApp.command("testroll", {
+                options: { "sides|d=i": 20 },
+                action: (opts, args, target) => {
+                    actionRan = true;
+                    return `Rolled ${opts.sides} for ${target}`;
+                }
+            });
+            const res = testApp.dispatch("/testroll -d 10 Dragon");
+            if (!res.matched) throw new Error("Command failed to match");
+            if (!actionRan) throw new Error("Action did not execute");
+            if (res.flags.sides !== 10) throw new Error(`Expected sides 10, got ${res.flags.sides}`);
+            if (res.target !== "Dragon") throw new Error(`Expected target Dragon, got ${res.target}`);
+        });
+
+        // Test 9: Dialogue unwrapping in Say/Do mode
+        run("Say/Do dialogue unwrapping", () => {
+            const testApp = cli();
+            testApp.command("check", {
+                options: { "val|v=i": 0 },
+                action: (opts) => `OK:${opts.val}`
+            });
+            const r1 = testApp.dispatch('Joe says, "/check -v 42."');
+            if (!r1.matched || r1.flags.val !== 42) throw new Error("Dialogue with trailing period inside quote failed");
+            const r2 = testApp.dispatch('> You say, "/check -v 99".');
+            if (!r2.matched || r2.flags.val !== 99) throw new Error("Dialogue with trailing period outside quote failed");
+        });
+
+        // Test 10: Multi-script pipeline passthrough
+        run("Multi-script pipeline passthrough (matched: false)", () => {
+            const testApp = cli();
+            testApp.command("localcmd", {});
+            const rOther = testApp.dispatch("/othercreator -x val");
+            if (rOther.matched !== false || rOther.text !== "/othercreator -x val") {
+                throw new Error("Unregistered slash command was not passed through");
+            }
+            const rProse = testApp.dispatch("You walk into the tavern.");
+            if (rProse.matched !== false || rProse.text !== "You walk into the tavern.") {
+                throw new Error("Narrative prose was not passed through");
+            }
+        });
+
+        const passed = results.filter(r => r.passed).length;
+        const failed = results.filter(r => !r.passed).length;
+        const total = results.length;
+
+        const lines = [
+            "==================================================================",
+            `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
+            "=================================================================="
+        ];
+
+        for (let i = 0; i < results.length; i++) {
+            const r = results[i];
+            const icon = r.passed ? "✔" : "✖";
+            lines.push(`  ${icon} ${i + 1}. ${r.name}`);
+            if (!r.passed && r.error) {
+                lines.push(`     ⚠️ Error: ${r.error}`);
+            }
+        }
+
+        lines.push("------------------------------------------------------------------");
+        if (failed === 0) {
+            lines.push(`  🎉 ALL ${total} TESTS PASSED (100% OPERATIONAL IN AI DUNGEON)`);
+        } else {
+            lines.push(`  ⚠️ ${failed} OF ${total} TESTS FAILED`);
+        }
+        lines.push("==================================================================");
+
+        return {
+            passed,
+            failed,
+            total,
+            results,
+            formatted: lines.join("\n")
+        };
+    }
+
     const api = {
         version: VERSION,
         // Layer 1: Core Option Parser
@@ -452,7 +603,10 @@
         // Layer 2: Command Router
         CLI: Router,
         Router,
-        cli
+        cli,
+        // In-game diagnostics & test
+        selfTest,
+        test: selfTest
     };
 
     // Safe global environment registration for AI Dungeon scripts

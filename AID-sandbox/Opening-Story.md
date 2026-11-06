@@ -37,7 +37,10 @@ This scenario is running **GetoptAID**! You can type any of the following slash 
 * `/stat -t "stealthy" -t "bilingual"` — Add character trait tags.
 * `/stat --meta class=Ranger --meta level=3` — Assign custom key-value metadata.
 
-#### 4. Help & Command Reference
-* `/help` (or `/help roll`, `/help inv`) — Display command manuals.
+#### 4. In-Game Self-Test Diagnostic (`/test`)
+* `/test` — Kick the tires! Runs an automated 10-point test suite directly inside AI Dungeon to verify all parsers, mobile normalization, and router hooks.
+
+#### 5. Help & Command Reference
+* `/help` (or `/help roll`, `/help inv`, `/help test`) — Display command manuals.
 
 What do you do next?

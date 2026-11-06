@@ -16,6 +16,7 @@ You take a seat by the crackling embers and assess your situation.
 * /inv -a "Steel Dagger" -a "Healing Draught" (Add multiple items)
 * /stat -v (View character sheet)
 * /stat --meta class=Ranger --hp 90 (Set attributes)
+* /test (Run in-game self-diagnostic test suite verifying GetoptAID)
 * /help (View full command manual)
 * Dialogue works naturally: You say, "/roll -d 20"
 ---

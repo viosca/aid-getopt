@@ -69,16 +69,23 @@ assert(r7.text.includes("GetoptAID Sandbox Command Center"), "Expected help head
 assert(r7.text.includes("/roll"), "Expected /roll in help");
 assert(r7.text.includes("/inv"), "Expected /inv in help");
 assert(r7.text.includes("/stat"), "Expected /stat in help");
+assert(r7.text.includes("/test"), "Expected /test in help");
 console.log("   ✔ /help master reference generated");
 
-// 8. Test unrecognized slash command passthrough (Multi-Script Pipeline)
-const r8 = runInput("/ec -p Molly -m entity");
-assert.strictEqual(r8.text, "/ec -p Molly -m entity", "Unrecognized /ec command must pass through untouched");
+// 8. Test /test (In-Game Self-Test)
+const r8 = runInput("/test");
+assert(r8.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header");
+assert(r8.text.includes("ALL 10 TESTS PASSED"), "Expected all tests passed in report");
+console.log("   ✔ /test in-game self-diagnostic suite executed with 100% success");
+
+// 9. Test unrecognized slash command passthrough (Multi-Script Pipeline)
+const r9 = runInput("/ec -p Molly -m entity");
+assert.strictEqual(r9.text, "/ec -p Molly -m entity", "Unrecognized /ec command must pass through untouched");
 console.log("   ✔ Unrecognized /ec command passed through untouched for downstream scripts");
 
-// 9. Test normal story prose passthrough
-const r9 = runInput("You sit down by the roaring hearth and order an ale from Oakhaven.");
-assert.strictEqual(r9.text, "You sit down by the roaring hearth and order an ale from Oakhaven.", "Prose must pass through untouched");
+// 10. Test normal story prose passthrough
+const r10 = runInput("You sit down by the roaring hearth and order an ale from Oakhaven.");
+assert.strictEqual(r10.text, "You sit down by the roaring hearth and order an ale from Oakhaven.", "Prose must pass through untouched");
 console.log("   ✔ Narrative story prose passed through untouched to AI Dungeon engine");
 
 console.log("==================================================================");

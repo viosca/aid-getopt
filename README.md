@@ -230,9 +230,22 @@ GetoptAID transparently handles mobile typing artifacts:
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing & In-Game Diagnostics
 
-GetoptAID includes a test suite covering option parsing, typed specs, arrays, hashes, closures, mobile edge cases, and simulated multi-script pipelines:
+### In-Game Self-Test (`/test` or `GetoptAID.selfTest()`)
+GetoptAID includes a built-in diagnostic test runner that can execute directly inside AI Dungeon's QuickJS sandbox to kick the tires and verify all parser functions, mobile dash normalization, and multi-script routing:
+
+```javascript
+// Run programmatically:
+const report = GetoptAID.selfTest();
+console.log(report.formatted);
+
+// Or via in-game slash command:
+// Player types: /test
+```
+
+### Local Automated Test Suite
+Run the 100% passing test suite across both Layer 1, Layer 2, and the AID Sandbox:
 
 ```bash
 npm test
@@ -257,10 +270,36 @@ npm test
    ✔ Unrecognized slash commands and story prose cleanly pass through (matched: false)
    ✔ AI Dungeon multi-script pipeline simulation passed with 100% harmony
 
+--- Part 3: In-Engine selfTest() Diagnostic Verification ---
+   ✔ GetoptAID.selfTest() executed cleanly with 100% success
+
 ==================================================================
-  🎉 ALL GetoptAID UNIT TESTS PASSED (100% SUCCESS)
+  TESTING AID-SANDBOX SCRIPT INTEGRATION
+==================================================================
+   ✔ /roll -d 20 -m 4 executed and formatted cleanly
+   ✔ /roll -d 20 -a (Advantage) rolled twice and kept highest
+   ✔ /roll —d 12 —m 2 (Mobile em-dashes) normalized and parsed
+   ✔ You say, "/roll -d 6 -m 1" dialogue wrapper unwrapped
+   ✔ /inv array accumulators (-a@), equipment (-e), and gold (-g) verified
+   ✔ /stat hash accumulators (--meta%), trait tags (-t@), and HP verified
+   ✔ /help master reference generated
+   ✔ /test in-game self-diagnostic suite executed with 100% success
+   ✔ Unrecognized /ec command passed through untouched for downstream scripts
+   ✔ Narrative story prose passed through untouched to AI Dungeon engine
+==================================================================
+  🎉 ALL UNIT & SANDBOX TESTS PASSED (100% SUCCESS)
 ==================================================================
 ```
+
+---
+
+## 🎮 Playable Scenario Sandbox
+
+Check out the [`AID-sandbox/`](AID-sandbox/) folder for a ready-to-play AI Dungeon scenario:
+- **`AI-Instruction.txt`**: Guide the AI GM to react dynamically to rolls and inventory.
+- **`Opening-Story.txt`**: Atmospheric crossroads tavern prompt with in-game command reference.
+- **`sandbox-script.js`**: Complete ready-to-paste script with `/roll`, `/inv`, `/stat`, `/test`, and `/help`.
+- **`README.md`**: Step-by-step instructions for standalone play or stacking in the AI Dungeon Script Loader.
 
 ---
 

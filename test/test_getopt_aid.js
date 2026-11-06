@@ -248,6 +248,16 @@ console.log("\n--- Part 2: Layer 2 Multi-Script Command Router ---");
     console.log("   ✔ AI Dungeon multi-script pipeline simulation passed with 100% harmony");
 }
 
+// Part 3: In-Engine selfTest() Verification
+console.log("\n--- Part 3: In-Engine selfTest() Diagnostic Verification ---");
+{
+    const report = GetoptAID.selfTest();
+    assert.strictEqual(report.failed, 0, `Expected 0 failures, got ${report.failed}`);
+    assert.strictEqual(report.passed, report.total, "All selfTest items should pass");
+    assert(report.formatted.includes("ALL 10 TESTS PASSED"), "Formatted report should confirm success");
+    console.log("   ✔ GetoptAID.selfTest() executed cleanly with 100% success");
+}
+
 console.log("\n==================================================================");
 console.log("  🎉 ALL GetoptAID UNIT TESTS PASSED (100% SUCCESS)");
 console.log("==================================================================");

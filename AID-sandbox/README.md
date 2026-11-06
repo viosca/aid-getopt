@@ -105,7 +105,11 @@ Once playing, try typing these commands in the action bar:
 - `/stat -t "stealthy" -t "bilingual"` — Add character traits.
 - `/stat --meta Class=Ranger --meta Level=3` — Assign custom key-value metadata using hash accumulators.
 
-### 4. Help Reference
+### 4. In-Game Self-Test Diagnostic (`/test` or `/check`)
+- `/test` — Kick the tires! Executes the in-engine 10-point self-test directly inside AI Dungeon's QuickJS environment, reporting live status on option parsing, typed specs, mobile dashes, and pipeline routing.
+- `/test -v` — Run self-test in verbose mode.
+
+### 5. Help Reference
 - `/help` — Output the full command manual.
 - `/roll -h` or `/inv -?` — View flag documentation for specific commands.
 
