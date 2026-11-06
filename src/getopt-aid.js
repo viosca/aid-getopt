@@ -23,6 +23,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
+    const GIT_HASH = "dev";
+    const BUILD_TIME = "dev";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -592,8 +594,37 @@
         };
     }
 
+    /**
+     * Structured metadata for module discovery and introspection.
+     */
+    function getInfo() {
+        return {
+            name: "GetoptAID",
+            version: VERSION,
+            gitHash: GIT_HASH,
+            buildTime: BUILD_TIME,
+            environment: (typeof globalThis !== "undefined" && globalThis.state)
+                ? "AI Dungeon QuickJS"
+                : (typeof process !== "undefined" && process.versions?.node)
+                    ? "Node.js"
+                    : "JavaScript"
+        };
+    }
+
+    /**
+     * One-line summary for calling scripts' /version and /info commands.
+     */
+    function getDiag() {
+        return `GetoptAID v${VERSION} (${GIT_HASH}) [${BUILD_TIME}]`;
+    }
+
     const api = {
+        name: "GetoptAID",
         version: VERSION,
+        gitHash: GIT_HASH,
+        buildTime: BUILD_TIME,
+        info: getInfo,
+        diag: getDiag,
         // Layer 1: Core Option Parser
         tokenize,
         getopt,
@@ -609,8 +640,15 @@
         test: selfTest
     };
 
-    // Safe global environment registration for AI Dungeon scripts
+    // Safe global environment & module registry for AI Dungeon scripts
     if (typeof globalThis !== "undefined") {
+        (globalThis.AID_MODULES ??= {})["getopt-aid"] = {
+            name: "GetoptAID",
+            version: VERSION,
+            gitHash: GIT_HASH,
+            buildTime: BUILD_TIME,
+            diag: getDiag
+        };
         if (!globalThis.GetoptAID || globalThis.GetoptAID.version < VERSION) {
             globalThis.GetoptAID = api;
         }
