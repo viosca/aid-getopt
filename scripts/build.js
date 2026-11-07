@@ -59,7 +59,7 @@ function main() {
 //
 //   Build Generation: ${timestamp}
 //   Git Commit:       ${gitHash}
-//   Repository:       https://github.com/viosca/getopt-aid
+//   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
 //   Paste this whole file as your ENTIRE "Library" tab in AI Dungeon.

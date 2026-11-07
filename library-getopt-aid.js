@@ -4,9 +4,9 @@
 //
 //                      GetoptAID Library (Ver. 1.0.0)
 //
-//   Build Generation: 2026-11-06 20:18:01 UTC
-//   Git Commit:       ef788d6
-//   Repository:       https://github.com/viosca/getopt-aid
+//   Build Generation: 2026-11-07 02:51:22 UTC
+//   Git Commit:       6e6966c
+//   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
 //   Paste this whole file as your ENTIRE "Library" tab in AI Dungeon.
@@ -43,8 +43,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "ef788d6";
-    const BUILD_TIME = "2026-11-06 20:18:01 UTC";
+    const GIT_HASH = "6e6966c";
+    const BUILD_TIME = "2026-11-07 02:51:22 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,

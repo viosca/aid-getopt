@@ -1,5 +1,5 @@
 {
-  "name": "getopt-aid",
+  "name": "aid-getopt",
   "version": "1.0.0",
   "description": "Lightweight POSIX/GNU option parser and multi-script slash-command router for AI Dungeon and interactive fiction",
   "main": "src/getopt-aid.js",
@@ -21,10 +21,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/viosca/getopt-aid.git"
+    "url": "git+https://github.com/viosca/aid-getopt.git"
   },
   "bugs": {
-    "url": "https://github.com/viosca/getopt-aid/issues"
+    "url": "https://github.com/viosca/aid-getopt/issues"
   },
-  "homepage": "https://github.com/viosca/getopt-aid#readme"
+  "homepage": "https://github.com/viosca/aid-getopt#readme"
 }
