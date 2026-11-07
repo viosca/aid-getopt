@@ -993,10 +993,5 @@ const modifier = (text) => {
     return { text };
 };
 
-// Standard AI Dungeon execution export
-if (typeof text !== "undefined") {
-    const res = modifier(text);
-    if (res && res.text !== undefined) {
-        text = res.text;
-    }
-}
+// Standard AI Dungeon execution hook
+modifier(typeof text !== "undefined" ? text : "");
