@@ -77,7 +77,19 @@ console.log("   ✔ /help master reference generated");
 const r8 = runInput("/test");
 assert(r8.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header");
 assert(r8.text.includes("ALL 10 TESTS PASSED"), "Expected all tests passed in report");
-console.log("   ✔ /test in-game self-diagnostic suite executed with 100% success");
+assert.strictEqual(r8.stop, true, "Self-test must halt AI generation");
+
+// 8b. Test AID Do mode formatting: "> You /test."
+const r8b = runInput("> You /test.");
+assert(r8b.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from Do mode with period");
+assert.strictEqual(r8b.stop, true, "Do mode command must halt AI generation");
+
+// 8c. Test trailing period: "/test."
+const r8c = runInput("/test.");
+assert(r8c.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from /test.");
+assert.strictEqual(r8c.stop, true, "Trailing period command must halt AI generation");
+
+console.log("   ✔ /test in-game self-diagnostic suite executed with 100% success (including Do mode & periods)");
 
 // 9. Test unrecognized slash command passthrough (Multi-Script Pipeline)
 const r9 = runInput("/ec -p Molly -m entity");

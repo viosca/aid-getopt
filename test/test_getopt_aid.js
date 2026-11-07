@@ -171,7 +171,21 @@ console.log("\n--- Part 2: Layer 2 Multi-Script Command Router ---");
     assert.strictEqual(res2.matched, true);
     assert.strictEqual(res2.command, "ec"); // matched alias ac -> canonical ec
     assert.strictEqual(res2.target, "Case");
-    console.log("   ✔ Dialogue unwrapping across Say/Do quotes and aliases verified");
+
+    // Test Do mode unwrapping ("> You /cmd." or "You /cmd.")
+    const res3 = app.dispatch('> You /ec -p Armitage.');
+    assert.strictEqual(res3.matched, true);
+    assert.strictEqual(res3.target, "Armitage");
+
+    const res4 = app.dispatch('You /ec -p Wintermute.');
+    assert.strictEqual(res4.matched, true);
+    assert.strictEqual(res4.target, "Wintermute");
+
+    // Test trailing period in raw slash command ("/ec.")
+    const res5 = app.dispatch('/ec.');
+    assert.strictEqual(res5.matched, true);
+
+    console.log("   ✔ Dialogue unwrapping across Say/Do quotes, Do prefixes, and aliases verified");
 }
 
 // Test 2.3: Non-interfering Pipeline Passthrough (The Multi-Script Golden Rule!)

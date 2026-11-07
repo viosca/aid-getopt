@@ -37,12 +37,17 @@
         if (!input || typeof input !== "string") return [];
 
         let str = input.trim();
-        // AID dialogue wrapper: e.g. > You say, "..." or Joe says, "..."
+        // 1. Dialogue wrapper unpacking (Say mode: e.g. > You say, "..." or Joe says, "...")
         const sayMatch = str.match(/(?:^|\n)(?:>\s*)?(?:You|[A-Za-z0-9_]+)\s*(?:says?|asks?|exclaims?|shouts?),?\s*["“]([\s\S]*?)["”][\s.!?]*$/i);
         if (sayMatch) {
             str = sayMatch[1].trim();
         }
-        // Clean trailing speech/sentence punctuation at end of command (preserving -? and closing quotes)
+        // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd")
+        const doMatch = str.match(/^(?:>\s*)?(?:You\s+)?(\/[\s\S]*)/i);
+        if (doMatch) {
+            str = doMatch[1].trim();
+        }
+        // 3. Clean trailing speech/sentence punctuation at end of command (preserving -? and closing quotes)
         if (str !== "-?" && str !== "--?") {
             str = str.replace(/(?<=\S)[.!?,;:)]+$/, "");
         }
@@ -374,10 +379,19 @@
             }
 
             let str = input.trim();
-            // Dialogue wrapper unpacking (Say/Do mode)
+            // 1. Dialogue wrapper unpacking (Say mode: e.g. > You say, "..." or Joe says, "...")
             const sayMatch = str.match(/(?:^|\n)(?:>\s*)?(?:You|[A-Za-z0-9_]+)\s*(?:says?|asks?|exclaims?|shouts?),?\s*["“]([\s\S]*?)["”][\s.!?]*$/i);
             if (sayMatch) {
                 str = sayMatch[1].trim();
+            }
+            // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd")
+            const doMatch = str.match(/^(?:>\s*)?(?:You\s+)?(\/[\s\S]*)/i);
+            if (doMatch) {
+                str = doMatch[1].trim();
+            }
+            // 3. Clean trailing speech/sentence punctuation at end of command (preserving -? and closing quotes)
+            if (str !== "-?" && str !== "--?") {
+                str = str.replace(/(?<=\S)[.!?,;:)]+$/, "");
             }
 
             // Check if input begins with a slash command: e.g. /roll or /ec
