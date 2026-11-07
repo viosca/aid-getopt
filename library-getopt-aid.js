@@ -4,8 +4,8 @@
 //
 //                      GetoptAID Library (Ver. 1.0.0)
 //
-//   Build Generation: 2026-11-07 02:51:22 UTC
-//   Git Commit:       6e6966c
+//   Build Generation: 2026-11-07 02:54:51 UTC
+//   Git Commit:       f951404
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -43,8 +43,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "6e6966c";
-    const BUILD_TIME = "2026-11-07 02:51:22 UTC";
+    const GIT_HASH = "f951404";
+    const BUILD_TIME = "2026-11-07 02:54:51 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
