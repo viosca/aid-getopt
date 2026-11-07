@@ -29,7 +29,6 @@ function runInput(input) {
 const r1 = runInput("/roll -d 20 -m 4");
 assert(r1.text.includes("DICE ROLL"), "Expected DICE ROLL in output");
 assert(r1.text.includes("1d20+4"), "Expected 1d20+4 in output");
-assert.strictEqual(r1.stop, true, "Commands must return stop: true to halt AI generation");
 console.log("   ✔ /roll -d 20 -m 4 executed and formatted cleanly");
 
 // 2. Test /roll advantage
@@ -77,17 +76,14 @@ console.log("   ✔ /help master reference generated");
 const r8 = runInput("/test");
 assert(r8.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header");
 assert(r8.text.includes("ALL 10 TESTS PASSED"), "Expected all tests passed in report");
-assert.strictEqual(r8.stop, true, "Self-test must halt AI generation");
 
 // 8b. Test AID Do mode formatting: "> You /test."
 const r8b = runInput("> You /test.");
 assert(r8b.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from Do mode with period");
-assert.strictEqual(r8b.stop, true, "Do mode command must halt AI generation");
 
 // 8c. Test trailing period: "/test."
 const r8c = runInput("/test.");
 assert(r8c.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from /test.");
-assert.strictEqual(r8c.stop, true, "Trailing period command must halt AI generation");
 
 console.log("   ✔ /test in-game self-diagnostic suite executed with 100% success (including Do mode & periods)");
 
@@ -99,7 +95,6 @@ console.log("   ✔ Unrecognized /ec command passed through untouched for downst
 // 10. Test normal story prose passthrough
 const r10 = runInput("You sit down by the roaring hearth and order an ale from Oakhaven.");
 assert.strictEqual(r10.text, "You sit down by the roaring hearth and order an ale from Oakhaven.", "Prose must pass through untouched");
-assert.strictEqual(r10.stop, undefined, "Prose must NOT halt AI generation");
 console.log("   ✔ Narrative story prose passed through untouched to AI Dungeon engine");
 
 console.log("==================================================================");

@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "469ac7d";
-    const BUILD_TIME = "2026-11-07 04:17:58 UTC";
+    const GIT_HASH = "6ebfead";
+    const BUILD_TIME = "2026-11-07 17:09:42 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -995,15 +995,10 @@ const modifier = (text) => {
 
     if (result.matched) {
         // Our command was handled!
-        // 1. Output result cleanly as a system message in the adventure history
-        // 2. Set stop: true to halt the AI engine (prevents LLM generation on command turns)
-        if (typeof stop !== "undefined") {
-            stop = true;
-        }
+        // Output result cleanly as a system message in the adventure
         const outputMsg = result.output ? `\n\n${result.output}\n\n` : "";
         return {
-            text: outputMsg,
-            stop: true
+            text: outputMsg
         };
     }
 
