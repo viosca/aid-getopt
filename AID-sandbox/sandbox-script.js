@@ -981,11 +981,15 @@ const modifier = (text) => {
 
     if (result.matched) {
         // Our command was handled!
-        // Output result cleanly as a system message in the adventure
+        // 1. Output result cleanly as a system message in the adventure history
+        // 2. Set stop: true to halt the AI engine (prevents LLM generation on command turns)
+        if (typeof stop !== "undefined") {
+            stop = true;
+        }
         const outputMsg = result.output ? `\n\n${result.output}\n\n` : "";
         return {
             text: outputMsg,
-            message: result.output || ""
+            stop: true
         };
     }
 
