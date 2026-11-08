@@ -129,10 +129,7 @@ function main() {
 //        modifier(text);
 //   3. In "Context" tab:
 //        const modifier = (text) => {
-//          let stop = (typeof globalThis !== "undefined" && typeof globalThis.stop !== "undefined") ? globalThis.stop : false;
-//          if (typeof GetoptSandbox === "function") {
-//            [text, stop] = GetoptSandbox("context", text, stop);
-//          }
+//          [text, stop] = GetoptSandbox("context", text, stop);
 //          return { text, stop };
 //        };
 //        modifier(text);

@@ -6,10 +6,6 @@
 // Requires: library-sandbox.js in the "Library" tab.
 // ============================================================================
 const modifier = (text) => {
-    let stop = (typeof globalThis !== "undefined" && typeof globalThis.stop !== "undefined")
-        ? globalThis.stop
-        : false;
-
     // If running alongside Auto-Cards or other scripts in RUN ORDER:
     // [text, stop] = AutoCards("context", text, stop);
 
