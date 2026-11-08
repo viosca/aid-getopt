@@ -22,26 +22,35 @@ An out-of-the-box playable AI Dungeon scenario demonstrating **GetoptAID** with 
 
 You can run this sandbox in AI Dungeon using either of two approaches:
 
-### Method 1: Running as a Standalone Script
+### Method 1: The Auto-Cards Multi-Tab Architecture (Recommended — Zero LLM Churn)
 
-Follow these steps to create a self-contained test scenario in AI Dungeon:
+This matches the standard, battle-tested architecture used by **Auto-Cards** and **Inner-Self**. It uses the **Context** tab to halt the engine immediately on command turns, **preventing 100% of LLM churn**:
 
 1. Open [AI Dungeon](https://play.aidungeon.com/) on desktop.
 2. Click **Create** ➔ **New Scenario**.
 3. Under **Scenario Details**:
    - Title: `GetoptAID Sandbox: The Crossroads`
-   - Paste the contents of [`Opening-Story.txt`](Opening-Story.txt) into the **Prompt** field.
-4. Click **Plot Components** (or **AI Instructions**):
-   - Paste the contents of [`AI-Instruction.txt`](AI-Instruction.txt) into the **AI Instructions** field.
-5. In the left navigation, click **Scripting**:
-   - Toggle **Scripts Enabled** to ON.
-   - Click the **Input Modifier** tab (or **Input**).
-   - Select all and paste the entire contents of [`sandbox-script.js`](sandbox-script.js).
-6. Click **Save** and click **Play**!
+   - Paste [`Opening-Story.txt`](Opening-Story.txt) into the **Prompt** field.
+   - Paste [`AI-Instruction.txt`](AI-Instruction.txt) into the **AI Instructions** field.
+4. Click **Scripting** (toggle **Scripts Enabled** to ON):
+   - **Library Tab:** Paste the entire contents of [`library-sandbox.js`](library-sandbox.js).
+   - **Input Tab:** Paste [`input.js`](input.js).
+   - **Context Tab:** Paste [`context.js`](context.js).
+   - **Output Tab:** Paste [`output.js`](output.js).
+5. Click **Save** and click **Play**!
 
 ---
 
-### Method 2: Using the AID Script Loader & Multi-Script Pipeline
+### Method 2: Single-Tab Quick Test (Input Only)
+
+If you only want to test commands in a single tab without modifying Context or Output:
+1. In the **Input** tab, paste [`sandbox-script.js`](sandbox-script.js).
+2. Leave other tabs at their defaults.
+*(Note: Because this method only runs in the Input hook, AI Dungeon will run a normal narrative continuation turn after your command output).*
+
+---
+
+### Method 3: Using the AID Script Loader & Multi-Script Pipeline
 
 AI Dungeon supports a **multi-script execution pipeline**, allowing scenario creators and adventure players to stack multiple independent scripts that run in sequence:
 

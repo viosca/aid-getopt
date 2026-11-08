@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "6ebfead";
-    const BUILD_TIME = "2026-11-07 17:09:42 UTC";
+    const GIT_HASH = "6e27f1b";
+    const BUILD_TIME = "2026-11-08 00:51:53 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -973,38 +973,70 @@ app.command("test", {
 // ============================================================================
 
 /**
- * AI Dungeon Input Modifier Hook
+ * Master lifecycle entry point for the GetoptAID Sandbox.
+ * Follows the standard AI Dungeon multi-tab contract (like Auto-Cards and Inner-Self).
  * 
- * Multi-Script Waterfall Rule:
- * 1. If input matches one of our commands (/roll, /inv, /stat, /help), we execute
- *    it, display the command output to the player, and consume the command.
- * 2. If input does NOT match one of our commands (e.g. normal narrative or another
- *    creator's slash command like /ec), GetoptAID returns { matched: false } and
- *    we pass the text through completely untouched so downstream scripts can run!
+ * @param {string} inHook - "input" | "context" | "output"
+ * @param {string} inText - Current text string passed by AI Dungeon
+ * @param {boolean} [inStop] - Current stop state (passed on context hook)
+ * @returns {string|[string, boolean]} - Modified text, or [text, stop] on context
  */
+function GetoptSandbox(inHook, inText, inStop) {
+    const HOOK = inHook;
+    const TEXT = (typeof inText === "string" ? inText : "");
+    const STOP = (inStop === true);
+
+    if (typeof state !== "undefined") {
+        state.GetoptSandbox ??= {};
+    }
+
+    switch (HOOK) {
+        case "input": {
+            const result = app.dispatch(TEXT, {
+                state: (typeof state !== "undefined" ? state : {}),
+                info: (typeof info !== "undefined" ? info : {})
+            });
+            if (result.matched) {
+                // Command handled! Flag context hook to halt LLM before generation
+                if (typeof state !== "undefined" && state.GetoptSandbox) {
+                    state.GetoptSandbox.stopTurn = true;
+                    state.GetoptSandbox.discardOutput = true;
+                }
+                return result.output ? `\n\n${result.output}\n\n` : "\n";
+            }
+            // Not our command: pass through untouched for downstream scripts or story engine
+            return TEXT;
+        }
+
+        case "context": {
+            if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.stopTurn) {
+                state.GetoptSandbox.stopTurn = false;
+                // Halt the AI model immediately! Eliminates 100% of LLM churn!
+                return [TEXT, true];
+            }
+            return [TEXT, STOP];
+        }
+
+        case "output": {
+            if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.discardOutput) {
+                state.GetoptSandbox.discardOutput = false;
+                // Defensive fallback if context hook was omitted or bypassed
+                return "\n";
+            }
+            return TEXT;
+        }
+
+        default:
+            return TEXT;
+    }
+}
+
+if (typeof globalThis !== "undefined") {
+    globalThis.GetoptSandbox = GetoptSandbox;
+}
+
+// Standalone single-tab execution hook (when used directly in the Input Modifier tab)
 const modifier = (text) => {
-    if (!text || typeof text !== "string") {
-        return { text };
-    }
-
-    // Pass execution context containing AI Dungeon's state
-    const result = app.dispatch(text, {
-        state: (typeof state !== "undefined" ? state : {}),
-        info: (typeof info !== "undefined" ? info : {})
-    });
-
-    if (result.matched) {
-        // Our command was handled!
-        // Output result cleanly as a system message in the adventure
-        const outputMsg = result.output ? `\n\n${result.output}\n\n` : "";
-        return {
-            text: outputMsg
-        };
-    }
-
-    // Not our command! Pass text through untouched for downstream scripts or story engine:
-    return { text };
+    return { text: GetoptSandbox("input", text) };
 };
-
-// Standard AI Dungeon execution hook
 modifier(typeof text !== "undefined" ? text : "");

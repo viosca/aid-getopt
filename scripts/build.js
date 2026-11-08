@@ -105,6 +105,58 @@ function main() {
                 console.error("   ⚠️ Could not sync sandbox-script.js syntax:", err);
             }
         }
+
+        // Generate AID-sandbox/library-sandbox.js (for Shared Library tab)
+        const trailingHookRegex = /\r?\n\/\/ Standalone single-tab execution hook[\s\S]*$/;
+        let libSandboxCode = sandboxCode.replace(trailingHookRegex, "\n");
+
+        const sandboxBanner = `// ============================================================================
+//
+//                      GetoptAID Sandbox Library
+//
+//   Build Generation: ${timestamp}
+//   Git Commit:       ${gitHash}
+//   Repository:       https://github.com/viosca/aid-getopt
+//   License:          MIT (c) Randy Viosca (@Random_Variable)
+//
+//   INSTRUCTIONS FOR AI DUNGEON:
+//   1. In scenario Scripts -> "Library" tab, paste this entire file.
+//   2. In "Input" tab:
+//        const modifier = (text) => {
+//          text = GetoptSandbox("input", text);
+//          return { text };
+//        };
+//        modifier(text);
+//   3. In "Context" tab:
+//        const modifier = (text) => {
+//          [text, stop] = GetoptSandbox("context", text, stop);
+//          return { text, stop };
+//        };
+//        modifier(text);
+//   4. In "Output" tab (optional):
+//        const modifier = (text) => {
+//          text = GetoptSandbox("output", text);
+//          return { text };
+//        };
+//        modifier(text);
+//
+//   Halts the AI engine on Context to eliminate 100% of LLM churn on commands!
+//
+// ============================================================================
+
+`;
+        libSandboxCode = libSandboxCode.replace(/^\/\*\*[\s\S]*?\*\/\r?\n\r?\n/, sandboxBanner);
+
+        try {
+            new vm.Script(libSandboxCode);
+            const SANDBOX_LIB_PATH = path.join(ROOT_DIR, "AID-sandbox", "library-sandbox.js");
+            fs.writeFileSync(SANDBOX_LIB_PATH, libSandboxCode, "utf8");
+            const sLines = libSandboxCode.split("\n").length;
+            const sKb = (Buffer.byteLength(libSandboxCode, "utf8") / 1024).toFixed(1);
+            console.log(`   ✔ Wrote AID-sandbox/library-sandbox.js (${sLines.toLocaleString()} lines, ${sKb} KB)`);
+        } catch (err) {
+            console.error("   ⚠️ Could not validate library-sandbox.js syntax:", err);
+        }
     }
 
     console.log("==================================================================");

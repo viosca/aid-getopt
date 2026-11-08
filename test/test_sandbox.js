@@ -4,7 +4,7 @@ const vm = require("vm");
 const assert = require("assert");
 
 console.log("==================================================================");
-console.log("  TESTING AID-SANDBOX SCRIPT INTEGRATION");
+console.log("  PART 1: SINGLE-TAB EXECUTION (sandbox-script.js)");
 console.log("==================================================================");
 
 const scriptPath = path.join(__dirname, "..", "AID-sandbox", "sandbox-script.js");
@@ -96,6 +96,88 @@ console.log("   ✔ Unrecognized /ec command passed through untouched for downst
 const r10 = runInput("You sit down by the roaring hearth and order an ale from Oakhaven.");
 assert.strictEqual(r10.text, "You sit down by the roaring hearth and order an ale from Oakhaven.", "Prose must pass through untouched");
 console.log("   ✔ Narrative story prose passed through untouched to AI Dungeon engine");
+
+console.log("==================================================================");
+console.log("  PART 2: MODULAR AUTO-CARDS ARCHITECTURE (library-sandbox.js)");
+console.log("==================================================================");
+
+{
+    const libPath = path.join(__dirname, "..", "AID-sandbox", "library-sandbox.js");
+    const inputPath = path.join(__dirname, "..", "AID-sandbox", "input.js");
+    const contextPath = path.join(__dirname, "..", "AID-sandbox", "context.js");
+    const outputPath = path.join(__dirname, "..", "AID-sandbox", "output.js");
+
+    const libCode = fs.readFileSync(libPath, "utf8");
+    const inputCode = fs.readFileSync(inputPath, "utf8");
+    const contextCode = fs.readFileSync(contextPath, "utf8");
+    const outputCode = fs.readFileSync(outputPath, "utf8");
+
+    const sharedContext = {
+        state: {},
+        info: { maxChars: 3500 },
+        console: console
+    };
+    sharedContext.globalThis = sharedContext;
+    vm.createContext(sharedContext);
+
+    // Load library-sandbox.js into Shared Library
+    vm.runInContext(libCode, sharedContext);
+    assert.strictEqual(typeof sharedContext.GetoptSandbox, "function", "GetoptSandbox must be exposed on globalThis");
+    console.log("   ✔ library-sandbox.js loaded and GetoptSandbox registered");
+
+    function runHook(hookCode, textVal, stopVal) {
+        // AI Dungeon executes each hook in a fresh isolate context with shared state & info
+        const hookCtx = {
+            state: sharedContext.state,
+            info: sharedContext.info,
+            text: textVal,
+            stop: stopVal,
+            console: console
+        };
+        hookCtx.globalThis = hookCtx;
+        vm.createContext(hookCtx);
+        // Prepend Library
+        vm.runInContext(libCode, hookCtx);
+        // Run Hook
+        const res = vm.runInContext(hookCode, hookCtx);
+        return res;
+    }
+
+    // Turn 1: Player executes /test in Do mode ("> You /test.")
+    // 1. Run Input hook
+    const inRes1 = runHook(inputCode, "> You /test.");
+    assert(inRes1.text.includes("GetoptAID In-Game Self-Test Suite"), "Input hook executed /test command");
+    assert.strictEqual(inRes1.stop, undefined, "Input hook must NOT return stop property");
+    assert.strictEqual(sharedContext.state.GetoptSandbox.stopTurn, true, "Input hook must set stopTurn flag in state");
+    console.log("   ✔ Input hook processed /test cleanly without illegal stop property");
+
+    // 2. Run Context hook (pre-LLM)
+    const ctxRes1 = runHook(contextCode, inRes1.text, false);
+    assert.strictEqual(ctxRes1.stop, true, "Context hook MUST set stop: true to halt LLM!");
+    assert.strictEqual(sharedContext.state.GetoptSandbox.stopTurn, false, "Context hook must consume stopTurn flag");
+    console.log("   ✔ Context hook returned stop: true, HALTING LLM generation (ZERO LLM CHURN!)");
+
+    // 3. Run Output hook (defensive safety net)
+    const outRes1 = runHook(outputCode, "Accidental LLM text");
+    assert.strictEqual(outRes1.text, "\n", "Output hook discarded LLM output as safety net");
+    console.log("   ✔ Output hook discarded accidental LLM output as defensive safety net");
+
+    // Turn 2: Player inputs normal story narrative ("You look across the room.")
+    const inRes2 = runHook(inputCode, "You look across the room.");
+    assert.strictEqual(inRes2.text, "You look across the room.", "Story text must pass through input hook untouched");
+
+    const ctxRes2 = runHook(contextCode, inRes2.text, false);
+    assert.strictEqual(ctxRes2.text, "You look across the room.");
+    assert.strictEqual(ctxRes2.stop, false, "Story text must NOT halt LLM generation");
+    console.log("   ✔ Normal story text passed through input & context hooks without halting");
+
+    // Turn 3: Downstream command /ec Molly -p (Multi-Script Pipeline)
+    const inRes3 = runHook(inputCode, "/ec Molly -p");
+    assert.strictEqual(inRes3.text, "/ec Molly -p", "Unrecognized command must pass through for downstream scripts");
+    const ctxRes3 = runHook(contextCode, inRes3.text, false);
+    assert.strictEqual(ctxRes3.stop, false, "Unrecognized command must NOT halt LLM generation");
+    console.log("   ✔ Downstream /ec command passed through untouched for next script in run order");
+}
 
 console.log("==================================================================");
 console.log("  🎉 ALL AID-SANDBOX SCRIPT TESTS PASSED (100% SUCCESS)");
