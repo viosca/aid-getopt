@@ -160,19 +160,19 @@ console.log("=================================================================="
     const inRes1 = runHook(inputCode, "> You /test.");
     assert(inRes1.text.includes("GetoptAID In-Game Self-Test Suite"), "Input hook executed /test command");
     assert.strictEqual(inRes1.stop, undefined, "Input hook must NOT return stop property");
-    assert.strictEqual(sharedContext.state.GetoptSandbox.stopTurn, true, "Input hook must set stopTurn flag in state");
-    console.log("   ✔ Input hook processed /test cleanly without illegal stop property");
+    assert.strictEqual(sharedContext.state.GetoptSandbox.discardOutput, true, "Input hook must set discardOutput flag in state");
+    console.log("   ✔ Input hook processed /test cleanly and flagged output discard");
 
     // 2. Run Context hook (pre-LLM)
     const ctxRes1 = runHook(contextCode, inRes1.text, false);
-    assert.strictEqual(ctxRes1.stop, true, "Context hook MUST set stop: true to halt LLM!");
-    assert.strictEqual(sharedContext.state.GetoptSandbox.stopTurn, false, "Context hook must consume stopTurn flag");
-    console.log("   ✔ Context hook returned stop: true, HALTING LLM generation (ZERO LLM CHURN!)");
+    assert.strictEqual(ctxRes1.stop, false, "Context hook passes through stop: false so that onOutput hook runs");
+    console.log("   ✔ Context hook passed through cleanly (Auto-Cards style)");
 
-    // 3. Run Output hook (defensive safety net)
+    // 3. Run Output hook (wipes model generation)
     const outRes1 = runHook(outputCode, "Accidental LLM text");
-    assert.strictEqual(outRes1.text, "\n", "Output hook discarded LLM output as safety net");
-    console.log("   ✔ Output hook discarded accidental LLM output as defensive safety net");
+    assert.strictEqual(outRes1.text, "\n", "Output hook discarded LLM output with newline");
+    assert.strictEqual(sharedContext.state.GetoptSandbox.discardOutput, false, "Output hook reset discardOutput flag");
+    console.log("   ✔ Output hook discarded model generation with newline (ZERO model text shown!)");
 
     // Turn 2: Player inputs normal story narrative ("You look across the room.")
     const inRes2 = runHook(inputCode, "You look across the room.");

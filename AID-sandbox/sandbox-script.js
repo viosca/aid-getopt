@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "9d077c0";
-    const BUILD_TIME = "2026-11-08 04:44:48 UTC";
+    const GIT_HASH = "ceab698";
+    const BUILD_TIME = "2026-11-08 05:08:57 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -997,9 +997,8 @@ function GetoptSandbox(inHook, inText, inStop) {
                 info: (typeof info !== "undefined" ? info : {})
             });
             if (result.matched) {
-                // Command handled! Flag context hook to halt LLM before generation
+                // Command handled! Flag output hook to discard model generation (Auto-Cards style)
                 if (typeof state !== "undefined" && state.GetoptSandbox) {
-                    state.GetoptSandbox.stopTurn = true;
                     state.GetoptSandbox.discardOutput = true;
                 }
                 return result.output ? `\n\n${result.output}\n\n` : "\n";
@@ -1009,18 +1008,14 @@ function GetoptSandbox(inHook, inText, inStop) {
         }
 
         case "context": {
-            if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.stopTurn) {
-                state.GetoptSandbox.stopTurn = false;
-                // Halt the AI model immediately! Eliminates 100% of LLM churn!
-                return [TEXT, true];
-            }
+            // Context passes through cleanly to ensure the onOutput hook runs
             return [TEXT, STOP];
         }
 
         case "output": {
             if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.discardOutput) {
                 state.GetoptSandbox.discardOutput = false;
-                // Defensive fallback if context hook was omitted or bypassed
+                // Discard model output with a single newline (identical to Auto-Cards output replacement)
                 return "\n";
             }
             return TEXT;
