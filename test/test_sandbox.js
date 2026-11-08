@@ -126,15 +126,20 @@ console.log("=================================================================="
     console.log("   ✔ library-sandbox.js loaded and GetoptSandbox registered");
 
     function runHook(hookCode, textVal, stopVal) {
-        // AI Dungeon executes each hook in a fresh isolate context with shared state & info
+        // AI Dungeon executes each hook in a fresh isolate context with shared state & info.
+        // NOTE: AID does NOT define 'stop' in the isolate scope; the hook modifier must handle it safely!
         const hookCtx = {
             state: sharedContext.state,
             info: sharedContext.info,
             text: textVal,
-            stop: stopVal,
             console: console
         };
-        hookCtx.globalThis = hookCtx;
+        if (typeof stopVal !== "undefined") {
+            hookCtx.globalThis = hookCtx;
+            hookCtx.globalThis.stop = stopVal;
+        } else {
+            hookCtx.globalThis = hookCtx;
+        }
         vm.createContext(hookCtx);
         // Prepend Library
         vm.runInContext(libCode, hookCtx);
@@ -142,6 +147,13 @@ console.log("=================================================================="
         const res = vm.runInContext(hookCode, hookCtx);
         return res;
     }
+
+    // Turn 0: First Turn Generation (Scenario start - no input hook runs, only context hook)
+    // In AID on turn 0, stop is completely undefined and must not throw ReferenceError!
+    const ctxTurn0 = runHook(contextCode, "Opening prompt from scenario prompt field", undefined);
+    assert.strictEqual(ctxTurn0.text, "Opening prompt from scenario prompt field");
+    assert.strictEqual(ctxTurn0.stop, false, "Turn 0 must not halt generation");
+    console.log("   ✔ Turn 0 (Scenario Start): Context hook safely ran with stop undefined (no ReferenceError!)");
 
     // Turn 1: Player executes /test in Do mode ("> You /test.")
     // 1. Run Input hook

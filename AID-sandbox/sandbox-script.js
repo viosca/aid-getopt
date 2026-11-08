@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "6e27f1b";
-    const BUILD_TIME = "2026-11-08 00:51:53 UTC";
+    const GIT_HASH = "29073b2";
+    const BUILD_TIME = "2026-11-08 01:03:53 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -1032,6 +1032,7 @@ function GetoptSandbox(inHook, inText, inStop) {
 }
 
 if (typeof globalThis !== "undefined") {
+    globalThis.stop ??= false;
     globalThis.GetoptSandbox = GetoptSandbox;
 }
 

@@ -2,8 +2,8 @@
 //
 //                      GetoptAID Sandbox Library
 //
-//   Build Generation: 2026-11-08 00:51:53 UTC
-//   Git Commit:       6e27f1b
+//   Build Generation: 2026-11-08 01:03:53 UTC
+//   Git Commit:       29073b2
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -17,7 +17,10 @@
 //        modifier(text);
 //   3. In "Context" tab:
 //        const modifier = (text) => {
-//          [text, stop] = GetoptSandbox("context", text, stop);
+//          let stop = (typeof globalThis !== "undefined" && typeof globalThis.stop !== "undefined") ? globalThis.stop : false;
+//          if (typeof GetoptSandbox === "function") {
+//            [text, stop] = GetoptSandbox("context", text, stop);
+//          }
 //          return { text, stop };
 //        };
 //        modifier(text);
@@ -60,8 +63,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "6e27f1b";
-    const BUILD_TIME = "2026-11-08 00:51:53 UTC";
+    const GIT_HASH = "29073b2";
+    const BUILD_TIME = "2026-11-08 01:03:53 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -1046,6 +1049,7 @@ function GetoptSandbox(inHook, inText, inStop) {
 }
 
 if (typeof globalThis !== "undefined") {
+    globalThis.stop ??= false;
     globalThis.GetoptSandbox = GetoptSandbox;
 }
 
