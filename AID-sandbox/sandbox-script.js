@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "ceab698";
-    const BUILD_TIME = "2026-11-08 05:08:57 UTC";
+    const GIT_HASH = "bd79b78";
+    const BUILD_TIME = "2026-11-08 07:22:05 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -65,8 +65,8 @@
         if (sayMatch) {
             str = sayMatch[1].trim();
         }
-        // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd")
-        const doMatch = str.match(/^(?:>\s*)?(?:You\s+)?(\/[\s\S]*)/i);
+        // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd" or "> You: /cmd")
+        const doMatch = str.match(/^(?:>\s*)?(?:You:?\s+)?(\/[\s\S]*)/i);
         if (doMatch) {
             str = doMatch[1].trim();
         }
@@ -407,8 +407,8 @@
             if (sayMatch) {
                 str = sayMatch[1].trim();
             }
-            // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd")
-            const doMatch = str.match(/^(?:>\s*)?(?:You\s+)?(\/[\s\S]*)/i);
+            // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd" or "> You: /cmd")
+            const doMatch = str.match(/^(?:>\s*)?(?:You:?\s+)?(\/[\s\S]*)/i);
             if (doMatch) {
                 str = doMatch[1].trim();
             }
@@ -992,17 +992,20 @@ function GetoptSandbox(inHook, inText, inStop) {
 
     switch (HOOK) {
         case "input": {
+            console.log("📥 [GetoptSandbox:Input] Received:", JSON.stringify(TEXT));
             const result = app.dispatch(TEXT, {
                 state: (typeof state !== "undefined" ? state : {}),
                 info: (typeof info !== "undefined" ? info : {})
             });
             if (result.matched) {
+                console.log("✔ [GetoptSandbox:Input] Command executed:", result.command);
                 // Command handled! Flag output hook to discard model generation (Auto-Cards style)
                 if (typeof state !== "undefined" && state.GetoptSandbox) {
                     state.GetoptSandbox.discardOutput = true;
                 }
                 return result.output ? `\n\n${result.output}\n\n` : "\n";
             }
+            console.log("ℹ️ [GetoptSandbox:Input] Text is not a recognized command; passing through.");
             // Not our command: pass through untouched for downstream scripts or story engine
             return TEXT;
         }
@@ -1015,6 +1018,7 @@ function GetoptSandbox(inHook, inText, inStop) {
         case "output": {
             if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.discardOutput) {
                 state.GetoptSandbox.discardOutput = false;
+                console.log("📤 [GetoptSandbox:Output] Model output suppressed with newline (Auto-Cards style).");
                 // Discard model output with a single newline (identical to Auto-Cards output replacement)
                 return "\n";
             }
@@ -1030,6 +1034,7 @@ if (typeof globalThis !== "undefined") {
     globalThis.stop ??= false;
     globalThis.GetoptSandbox = GetoptSandbox;
 }
+console.log("🎲 [GetoptSandbox] Library loaded and ready.");
 
 // Standalone single-tab execution hook (when used directly in the Input Modifier tab)
 const modifier = (text) => {

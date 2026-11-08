@@ -11,6 +11,8 @@ const modifier = (text) => {
 
     if (typeof GetoptSandbox === "function") {
         [text, stop] = GetoptSandbox("context", text, stop);
+    } else {
+        console.log("⚠️ [Context Hook] GetoptSandbox is NOT defined! The Shared Library tab is empty or not loaded.");
     }
     return { text, stop };
 };

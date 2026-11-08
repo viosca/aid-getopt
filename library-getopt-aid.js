@@ -4,8 +4,8 @@
 //
 //                      GetoptAID Library (Ver. 1.0.0)
 //
-//   Build Generation: 2026-11-08 05:08:57 UTC
-//   Git Commit:       ceab698
+//   Build Generation: 2026-11-08 07:22:05 UTC
+//   Git Commit:       bd79b78
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -43,8 +43,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "ceab698";
-    const BUILD_TIME = "2026-11-08 05:08:57 UTC";
+    const GIT_HASH = "bd79b78";
+    const BUILD_TIME = "2026-11-08 07:22:05 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -62,8 +62,8 @@
         if (sayMatch) {
             str = sayMatch[1].trim();
         }
-        // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd")
-        const doMatch = str.match(/^(?:>\s*)?(?:You\s+)?(\/[\s\S]*)/i);
+        // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd" or "> You: /cmd")
+        const doMatch = str.match(/^(?:>\s*)?(?:You:?\s+)?(\/[\s\S]*)/i);
         if (doMatch) {
             str = doMatch[1].trim();
         }
@@ -404,8 +404,8 @@
             if (sayMatch) {
                 str = sayMatch[1].trim();
             }
-            // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd")
-            const doMatch = str.match(/^(?:>\s*)?(?:You\s+)?(\/[\s\S]*)/i);
+            // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd" or "> You: /cmd")
+            const doMatch = str.match(/^(?:>\s*)?(?:You:?\s+)?(\/[\s\S]*)/i);
             if (doMatch) {
                 str = doMatch[1].trim();
             }

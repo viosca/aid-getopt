@@ -42,8 +42,8 @@
         if (sayMatch) {
             str = sayMatch[1].trim();
         }
-        // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd")
-        const doMatch = str.match(/^(?:>\s*)?(?:You\s+)?(\/[\s\S]*)/i);
+        // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd" or "> You: /cmd")
+        const doMatch = str.match(/^(?:>\s*)?(?:You:?\s+)?(\/[\s\S]*)/i);
         if (doMatch) {
             str = doMatch[1].trim();
         }
@@ -384,8 +384,8 @@
             if (sayMatch) {
                 str = sayMatch[1].trim();
             }
-            // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd")
-            const doMatch = str.match(/^(?:>\s*)?(?:You\s+)?(\/[\s\S]*)/i);
+            // 2. Action prefix unpacking (Do mode: e.g. "> You /cmd" or "You /cmd" or "> You: /cmd")
+            const doMatch = str.match(/^(?:>\s*)?(?:You:?\s+)?(\/[\s\S]*)/i);
             if (doMatch) {
                 str = doMatch[1].trim();
             }

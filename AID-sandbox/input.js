@@ -10,6 +10,8 @@ const modifier = (text) => {
 
     if (typeof GetoptSandbox === "function") {
         text = GetoptSandbox("input", text);
+    } else {
+        console.log("⚠️ [Input Hook] GetoptSandbox is NOT defined! The Shared Library tab is empty or not loaded.");
     }
     return { text };
 };
