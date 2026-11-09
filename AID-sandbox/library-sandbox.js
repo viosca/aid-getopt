@@ -2,8 +2,8 @@
 //
 //                      GetoptAID Sandbox Library
 //
-//   Build Generation: 2026-11-09 02:51:26 UTC
-//   Git Commit:       1f6142e
+//   Build Generation: 2026-11-09 03:04:07 UTC
+//   Git Commit:       7a1a7ea
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -60,8 +60,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "1f6142e";
-    const BUILD_TIME = "2026-11-09 02:51:26 UTC";
+    const GIT_HASH = "7a1a7ea";
+    const BUILD_TIME = "2026-11-09 03:04:07 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -1151,18 +1151,6 @@ app.command("test", {
  * @param {boolean} [inStop] - Current stop state (passed on context hook)
  * @returns {string|[string, boolean]} - Modified text, or [text, stop] on context
  */
-/**
- * Safe logging helper that will NEVER throw in isolated-vm or QuickJS
- * if console or console.log is unmapped or undefined.
- */
-function _aidLog(...args) {
-    if (typeof console !== "undefined" && typeof console.log === "function") {
-        try {
-            console.log(...args);
-        } catch (_) {}
-    }
-}
-
 function GetoptSandbox(inHook, inText, inStop) {
     const HOOK = inHook;
     const TEXT = (typeof inText === "string" ? inText : "");
@@ -1174,13 +1162,11 @@ function GetoptSandbox(inHook, inText, inStop) {
 
     switch (HOOK) {
         case "input": {
-            _aidLog("📥 [GetoptSandbox:Input] Received:", JSON.stringify(TEXT));
             const result = app.dispatch(TEXT, {
                 state: (typeof state !== "undefined" ? state : {}),
                 info: (typeof info !== "undefined" ? info : {})
             });
             if (result.matched) {
-                _aidLog("✔ [GetoptSandbox:Input] Command executed:", result.command);
                 // Store command output for the output hook (story text).
                 // In AI Dungeon, story text (Output) renders Markdown and preserves newlines,
                 // whereas action text (Input) collapses newlines into spaces and strips Markdown.
@@ -1189,7 +1175,6 @@ function GetoptSandbox(inHook, inText, inStop) {
                 }
                 return TEXT;
             }
-            _aidLog("ℹ️ [GetoptSandbox:Input] Text is not a recognized command; passing through.");
             // Not our command: pass through untouched for downstream scripts or story engine
             return TEXT;
         }
@@ -1203,7 +1188,6 @@ function GetoptSandbox(inHook, inText, inStop) {
             if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.commandOutput !== undefined) {
                 const out = state.GetoptSandbox.commandOutput;
                 delete state.GetoptSandbox.commandOutput;
-                _aidLog("📤 [GetoptSandbox:Output] Emitted command output in story text (clean spacing).");
                 return out ? `${out.trim()}\n` : "\n";
             }
             return TEXT;
@@ -1217,7 +1201,5 @@ function GetoptSandbox(inHook, inText, inStop) {
 if (typeof globalThis !== "undefined") {
     globalThis.stop ??= false;
     globalThis.GetoptSandbox = GetoptSandbox;
-    globalThis._aidLog = _aidLog;
 }
-_aidLog("🎲 [GetoptSandbox] Library loaded and ready.");
 
