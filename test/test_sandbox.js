@@ -70,7 +70,21 @@ assert(r7.text.includes("/roll"), "Expected /roll in help");
 assert(r7.text.includes("/inv"), "Expected /inv in help");
 assert(r7.text.includes("/stat"), "Expected /stat in help");
 assert(r7.text.includes("/test"), "Expected /test in help");
+assert(r7.text.includes("/version"), "Expected /version in help");
+assert(r7.text.includes("/diag"), "Expected /diag in help");
 console.log("   ✔ /help master reference generated");
+
+// 7b. Test /version
+const r7b = runInput("/version");
+assert(r7b.text.includes("GetoptAID Build Information"), "Expected Build Information in /version");
+assert(r7b.text.includes("Version:    v1.0.0"), "Expected version in /version");
+console.log("   ✔ /version command verified");
+
+// 7c. Test /diag
+const r7c = runInput("/diag");
+assert(r7c.text.includes("GetoptAID System Diagnostics"), "Expected Diagnostics header in /diag");
+assert(r7c.text.includes("Parser:"), "Expected Parser info in /diag");
+console.log("   ✔ /diag command verified");
 
 // 8. Test /test (In-Game Self-Test)
 const r8 = runInput("/test");

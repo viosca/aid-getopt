@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "0fa8f80";
-    const BUILD_TIME = "2026-11-09 02:20:39 UTC";
+    const GIT_HASH = "2f32cae";
+    const BUILD_TIME = "2026-11-09 02:37:17 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -603,6 +603,7 @@
             "```",
             "==================================================================",
             `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
+            `  Build: ${GIT_HASH} [${BUILD_TIME}]`,
             "=================================================================="
         ];
 
@@ -935,6 +936,8 @@ app.command("help", {
             app.help(),
             "Tips:",
             "  • Type '/test' to run the in-game self-diagnostic test suite",
+            "  • Type '/version' to view module version, git hash, and build timestamp",
+            "  • Type '/diag' to inspect active runtime environment and loaded modules",
             "  • Type '/<cmd> --help' for options on any command (e.g. /roll -h)",
             "  • Commands work in Do, Say, or Story mode",
             "  • Normal speech & story prose pass through untouched to other scripts!",
@@ -944,7 +947,86 @@ app.command("help", {
     }
 });
 
-// Command 5: /test - In-Game Self-Test & Diagnostic Suite
+// Command 5: /version - Engine Version & Git Hash
+app.command("version", {
+    aliases: ["ver", "v"],
+    description: "Display GetoptAID engine build version, git hash, and release timestamp",
+    options: {
+        "help|h|?": false
+    },
+    action: (flags) => {
+        if (flags.help) {
+            return [
+                "ℹ️ [VERSION HELP]",
+                "Usage: /version (or /ver, /v)",
+                "Displays the GetoptAID engine version, git commit hash, and build date."
+            ].join("\n");
+        }
+        const engine = (typeof globalThis !== "undefined" && globalThis.GetoptAID)
+            ? globalThis.GetoptAID
+            : (typeof api !== "undefined" ? api : null);
+        const info = (engine && typeof engine.info === "function")
+            ? engine.info()
+            : { version: "1.0.0", gitHash: "unknown", buildTime: "unknown", environment: "AI Dungeon QuickJS" };
+        return [
+            "```",
+            "==================================================================",
+            "  🎯 GetoptAID Build Information",
+            "==================================================================",
+            `  Version:    v${info.version}`,
+            `  Git Commit: ${info.gitHash}`,
+            `  Build Time: ${info.buildTime}`,
+            `  Runtime:    ${info.environment || "AI Dungeon QuickJS"}`,
+            "==================================================================",
+            "```"
+        ].join("\n");
+    }
+});
+
+// Command 6: /diag - Runtime System Diagnostics
+app.command("diag", {
+    aliases: ["diagnostics", "d"],
+    description: "Display runtime environment, loaded modules, and state diagnostics",
+    options: {
+        "help|h|?": false
+    },
+    action: (flags) => {
+        if (flags.help) {
+            return [
+                "⚙️ [DIAGNOSTICS HELP]",
+                "Usage: /diag (or /diagnostics, /d)",
+                "Displays system diagnostics, active global scripts, and pipeline state."
+            ].join("\n");
+        }
+        const engine = (typeof globalThis !== "undefined" && globalThis.GetoptAID)
+            ? globalThis.GetoptAID
+            : (typeof api !== "undefined" ? api : null);
+        const diagStr = (engine && typeof engine.diag === "function")
+            ? engine.diag()
+            : "GetoptAID v1.0.0";
+        const modules = [];
+        if (typeof globalThis !== "undefined") {
+            if (globalThis.GetoptAID) modules.push("GetoptAID");
+            if (globalThis.GetoptSandbox) modules.push("GetoptSandbox");
+            if (globalThis.AutoCards) modules.push("AutoCards");
+            if (globalThis.InnerEntity || globalThis.InnerSelf) modules.push("InnerEntity");
+        }
+        return [
+            "```",
+            "==================================================================",
+            "  ⚙️ GetoptAID System Diagnostics",
+            "==================================================================",
+            `  Parser:     ${diagStr}`,
+            `  Lifecycle:  Multi-Tab Cooperative (Auto-Cards compatible)`,
+            `  Modules:    ${modules.length ? modules.join(", ") : "GetoptAID Standalone"}`,
+            `  State Key:  state.GetoptSandbox`,
+            "==================================================================",
+            "```"
+        ].join("\n");
+    }
+});
+
+// Command 7: /test - In-Game Self-Test & Diagnostic Suite
 app.command("test", {
     aliases: ["selftest", "check", "verify"],
     description: "Run in-game self-diagnostic test suite verifying GetoptAID operation on AI Dungeon",

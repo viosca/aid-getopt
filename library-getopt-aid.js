@@ -4,8 +4,8 @@
 //
 //                      GetoptAID Library (Ver. 1.0.0)
 //
-//   Build Generation: 2026-11-09 02:20:39 UTC
-//   Git Commit:       0fa8f80
+//   Build Generation: 2026-11-09 02:37:17 UTC
+//   Git Commit:       2f32cae
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -43,8 +43,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "0fa8f80";
-    const BUILD_TIME = "2026-11-09 02:20:39 UTC";
+    const GIT_HASH = "2f32cae";
+    const BUILD_TIME = "2026-11-09 02:37:17 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -600,6 +600,7 @@
             "```",
             "==================================================================",
             `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
+            `  Build: ${GIT_HASH} [${BUILD_TIME}]`,
             "=================================================================="
         ];
 
