@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "bd79b78";
-    const BUILD_TIME = "2026-11-08 07:22:05 UTC";
+    const GIT_HASH = "bb2256e";
+    const BUILD_TIME = "2026-11-09 01:31:27 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -600,6 +600,7 @@
         const total = results.length;
 
         const lines = [
+            "```",
             "==================================================================",
             `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
             "=================================================================="
@@ -621,6 +622,7 @@
             lines.push(`  ⚠️ ${failed} OF ${total} TESTS FAILED`);
         }
         lines.push("==================================================================");
+        lines.push("```");
 
         return {
             passed,
@@ -753,7 +755,7 @@ app.command("roll", {
         const total = sum + mod;
         const rollList = rolls.length > 1 ? ` [${rolls.join(", ")}]` : ` [${rolls[0]}]`;
         const modStr = mod !== 0 ? (mod > 0 ? `+${mod}` : `${mod}`) : "";
-        return `🎲 [DICE ROLL]\nRolled ${count}d${sides}${modStr}:${rollList} = **${total}**`;
+        return `🎲 **[DICE ROLL]**\n\nRolled ${count}d${sides}${modStr}:${rollList} = **${total}**`;
     }
 });
 
@@ -838,15 +840,15 @@ app.command("inv", {
         // Render sheet
         const out = [];
         if (logs.length > 0) {
-            out.push(logs.join("\n"));
+            out.push(logs.map(l => `> *${l}*`).join("\n\n"));
         }
 
-        out.push("📦 [INVENTORY]");
-        out.push(`• Equipped: ${inv.equipped || "(none)"}`);
-        out.push(`• Pack: ${inv.items.length ? inv.items.join(", ") : "(empty)"}`);
-        out.push(`• Gold: ${inv.gold} coins`);
+        out.push("**📦 [INVENTORY]**");
+        out.push(`- **Equipped:** ${inv.equipped || "(none)"}`);
+        out.push(`- **Pack:** ${inv.items.length ? inv.items.join(", ") : "(empty)"}`);
+        out.push(`- **Gold:** ${inv.gold} coins`);
 
-        return out.join("\n");
+        return out.join("\n\n");
     }
 });
 
@@ -912,11 +914,11 @@ app.command("stat", {
 
         const metaParts = Object.entries(char.meta).map(([k, v]) => `${k}: ${v}`).join(" | ");
         return [
-            "🛡️ [CHARACTER STATUS]",
-            `• ${metaParts || "Class: Adventurer"}`,
-            `• Health: ${char.hp}/${char.maxHp} HP  |  Mana: ${char.mp}/${char.maxMp} MP`,
-            `• Traits: ${char.tags.join(", ") || "(none)"}`
-        ].join("\n");
+            "**🛡️ [CHARACTER STATUS]**",
+            `- **Class/Meta:** ${metaParts || "Adventurer"}`,
+            `- **Health:** ${char.hp}/${char.maxHp} HP  |  **Mana:** ${char.mp}/${char.maxMp} MP`,
+            `- **Traits:** ${char.tags.join(", ") || "(none)"}`
+        ].join("\n\n");
     }
 });
 
@@ -926,6 +928,7 @@ app.command("help", {
     description: "Display command manuals and examples",
     action: (flags, operands, target) => {
         return [
+            "```",
             "==================================================================",
             "  🎯 GetoptAID Sandbox Command Center",
             "==================================================================",
@@ -935,7 +938,8 @@ app.command("help", {
             "  • Type '/<cmd> --help' for options on any command (e.g. /roll -h)",
             "  • Commands work in Do, Say, or Story mode",
             "  • Normal speech & story prose pass through untouched to other scripts!",
-            "=================================================================="
+            "==================================================================",
+            "```"
         ].join("\n");
     }
 });

@@ -4,8 +4,8 @@
 //
 //                      GetoptAID Library (Ver. 1.0.0)
 //
-//   Build Generation: 2026-11-08 07:22:05 UTC
-//   Git Commit:       bd79b78
+//   Build Generation: 2026-11-09 01:31:27 UTC
+//   Git Commit:       bb2256e
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -43,8 +43,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "bd79b78";
-    const BUILD_TIME = "2026-11-08 07:22:05 UTC";
+    const GIT_HASH = "bb2256e";
+    const BUILD_TIME = "2026-11-09 01:31:27 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -597,6 +597,7 @@
         const total = results.length;
 
         const lines = [
+            "```",
             "==================================================================",
             `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
             "=================================================================="
@@ -618,6 +619,7 @@
             lines.push(`  ⚠️ ${failed} OF ${total} TESTS FAILED`);
         }
         lines.push("==================================================================");
+        lines.push("```");
 
         return {
             passed,
