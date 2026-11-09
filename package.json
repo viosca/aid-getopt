@@ -2,10 +2,10 @@
   "name": "aid-getopt",
   "version": "1.0.0",
   "description": "Lightweight POSIX/GNU option parser and multi-script slash-command router for AI Dungeon and interactive fiction",
-  "main": "src/getopt-aid.js",
+  "main": "src/aid-getopt.js",
   "scripts": {
     "build": "node scripts/build.js",
-    "test": "node scripts/build.js && node test/test_getopt_aid.js && node test/test_sandbox.js"
+    "test": "node scripts/build.js && node test/test_aid_getopt.js && node test/test_sandbox.js"
   },
   "keywords": [
     "ai-dungeon",

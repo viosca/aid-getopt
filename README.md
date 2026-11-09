@@ -56,13 +56,13 @@ GetoptAID is split into two independent layers to fit any script design:
 ## 🚀 Installation
 
 ### Option A: As a Git Submodule (Recommended)
-Add GetoptAID as a submodule inside your AI Dungeon project:
+Add AID-Getopt as a submodule inside your AI Dungeon project:
 ```bash
-git submodule add https://github.com/viosca/getopt-aid.git submodules/getopt-aid
+git submodule add https://github.com/viosca/aid-getopt.git submodules/aid-getopt
 ```
 
 ### Option B: Direct Copy
-Copy `src/getopt-aid.js` directly into your repository's `lib/` directory or bundle it with your script build pipeline.
+Copy `src/aid-getopt.js` directly into your repository's `lib/` directory or bundle it with your script build pipeline.
 
 ---
 
@@ -72,7 +72,7 @@ Copy `src/getopt-aid.js` directly into your repository's `lib/` directory or bun
 If you already have your own command handler and just want POSIX/GNU option parsing:
 
 ```javascript
-const { getopt } = require("getopt-aid"); // or globalThis.GetoptAID
+const { getopt } = require("aid-getopt"); // or globalThis.AIDGetopt
 
 const spec = {
     "mode|m=s":    "dynamic",     // String option with alias -m, default "dynamic"

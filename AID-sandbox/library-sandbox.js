@@ -1,9 +1,9 @@
 // ============================================================================
 //
-//                      GetoptAID Sandbox Library
+//                      AID-Getopt Sandbox Library
 //
-//   Build Generation: 2026-11-09 03:52:47 UTC
-//   Git Commit:       1677426
+//   Build Generation: 2026-11-09 16:20:34 UTC
+//   Git Commit:       225a481
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -36,13 +36,13 @@
 // PART 1: EMBEDDED GetoptAID ENGINE (Layer 1 Parser & Layer 2 Router)
 // ============================================================================
 /**
- * GetoptAID - POSIX/GNU-Style Option Parser & Multi-Script Slash Command Router for AI Dungeon
+ * AID-Getopt - POSIX/GNU-Style Option Parser & Multi-Script Slash Command Router for AI Dungeon
  *
  * Architecture:
- * - Layer 1: Core Option Parser (GetoptAID.getopt / GetoptAID.parse)
+ * - Layer 1: Core Option Parser (AIDGetopt.getopt / AIDGetopt.parse)
  *   POSIX & GNU-style option parsing, Perl-style compact specs ("mode|m=s", "tags|t=s@"),
  *   array/hash accumulators, closures/action callbacks, and mobile typography tolerance.
- * - Layer 2: Command Router & Multi-Script Dispatcher (GetoptAID.cli / GetoptAID.CLI)
+ * - Layer 2: Command Router & Multi-Script Dispatcher (AIDGetopt.cli / AIDGetopt.CLI)
  *   Multi-command slash router with dialogue unwrapping and non-interfering pipeline passthrough
  *   (matched: false) for sequential script execution in AI Dungeon.
  *
@@ -54,14 +54,14 @@
     if (typeof module === "object" && module.exports) {
         module.exports = factory();
     } else {
-        root.GetoptAID = factory();
+        root.AIDGetopt = root.GetoptAID = factory();
     }
 })(typeof globalThis !== "undefined" ? globalThis : this, function() {
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "1677426";
-    const BUILD_TIME = "2026-11-09 03:52:47 UTC";
+    const GIT_HASH = "225a481";
+    const BUILD_TIME = "2026-11-09 16:20:34 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -615,7 +615,7 @@
 
         const lines = [
             "==================================================================",
-            `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
+            `  🎯 AID-Getopt In-Game Self-Test Suite (v${VERSION})`,
             `  Build: ${GIT_HASH} [${BUILD_TIME}]`,
             "=================================================================="
         ];
@@ -651,7 +651,7 @@
      */
     function getInfo() {
         return {
-            name: "GetoptAID",
+            name: "AID-Getopt",
             version: VERSION,
             gitHash: GIT_HASH,
             buildTime: BUILD_TIME,
@@ -667,11 +667,11 @@
      * One-line summary for calling scripts' /version and /info commands.
      */
     function getDiag() {
-        return `GetoptAID v${VERSION} (${GIT_HASH}) [${BUILD_TIME}]`;
+        return `AID-Getopt v${VERSION} (${GIT_HASH}) [${BUILD_TIME}]`;
     }
 
     const api = {
-        name: "GetoptAID",
+        name: "AID-Getopt",
         version: VERSION,
         gitHash: GIT_HASH,
         buildTime: BUILD_TIME,
@@ -694,15 +694,20 @@
 
     // Safe global environment & module registry for AI Dungeon scripts
     if (typeof globalThis !== "undefined") {
-        (globalThis.AID_MODULES ??= {})["getopt-aid"] = {
-            name: "GetoptAID",
+        const modRecord = {
+            name: "AID-Getopt",
             version: VERSION,
             gitHash: GIT_HASH,
             buildTime: BUILD_TIME,
             diag: getDiag
         };
+        (globalThis.AID_MODULES ??= {})["aid-getopt"] = modRecord;
+        globalThis.AID_MODULES["getopt-aid"] = modRecord; // backward compatibility
+        if (!globalThis.AIDGetopt || globalThis.AIDGetopt.version < VERSION) {
+            globalThis.AIDGetopt = api;
+        }
         if (!globalThis.GetoptAID || globalThis.GetoptAID.version < VERSION) {
-            globalThis.GetoptAID = api;
+            globalThis.GetoptAID = api; // backward compatibility
         }
     }
 
@@ -713,8 +718,8 @@
 // PART 2: COMMAND DEFINITIONS & ROUTER CONFIGURATION
 // ============================================================================
 
-const app = (typeof globalThis !== "undefined" && globalThis.GetoptAID)
-    ? globalThis.GetoptAID.cli()
+const app = (typeof globalThis !== "undefined" && (globalThis.AIDGetopt || globalThis.GetoptAID))
+    ? (globalThis.AIDGetopt || globalThis.GetoptAID).cli()
     : new Router();
 
 // Command 1: /roll - Dice Roller with modifiers, counts, and advantage
@@ -942,7 +947,7 @@ app.command("help", {
     action: (flags, operands, target) => {
         return [
             "==================================================================",
-            "  🎯 GetoptAID Sandbox Command Center",
+            "  🎯 AID-Getopt Sandbox Command Center",
             "==================================================================",
             app.help(),
             "Tips:",
@@ -960,7 +965,7 @@ app.command("help", {
 // Command 5: /version - Engine Version & Git Hash
 app.command("version", {
     aliases: ["ver", "v"],
-    description: "Display GetoptAID engine build version, git hash, and release timestamp",
+    description: "Display AID-Getopt engine build version, git hash, and release timestamp",
     options: {
         "help|h|?": false
     },
@@ -969,18 +974,18 @@ app.command("version", {
             return [
                 "ℹ️ [VERSION HELP]",
                 "Usage: /version (or /ver, /v)",
-                "Displays the GetoptAID engine version, git commit hash, and build date."
+                "Displays the AID-Getopt engine version, git commit hash, and build date."
             ].join("\n");
         }
-        const engine = (typeof globalThis !== "undefined" && globalThis.GetoptAID)
-            ? globalThis.GetoptAID
+        const engine = (typeof globalThis !== "undefined" && (globalThis.AIDGetopt || globalThis.GetoptAID))
+            ? (globalThis.AIDGetopt || globalThis.GetoptAID)
             : (typeof api !== "undefined" ? api : null);
         const info = (engine && typeof engine.info === "function")
             ? engine.info()
             : { version: "1.0.0", gitHash: "unknown", buildTime: "unknown", environment: "AI Dungeon QuickJS" };
         return [
             "==================================================================",
-            "  🎯 GetoptAID Build Information",
+            "  🎯 AID-Getopt Build Information",
             "==================================================================",
             `  Version:    v${info.version}`,
             `  Git Commit: ${info.gitHash}`,
@@ -1015,15 +1020,15 @@ app.command("diag", {
                 "Displays system diagnostics, active global scripts, and pipeline state."
             ].join("\n");
         }
-        const engine = (typeof globalThis !== "undefined" && globalThis.GetoptAID)
-            ? globalThis.GetoptAID
+        const engine = (typeof globalThis !== "undefined" && (globalThis.AIDGetopt || globalThis.GetoptAID))
+            ? (globalThis.AIDGetopt || globalThis.GetoptAID)
             : (typeof api !== "undefined" ? api : null);
         const diagStr = (engine && typeof engine.diag === "function")
             ? engine.diag()
-            : "GetoptAID v1.0.0";
+            : "AID-Getopt v1.0.0";
         const modules = [];
         if (typeof globalThis !== "undefined") {
-            if (globalThis.GetoptAID) modules.push("GetoptAID");
+            if (globalThis.AIDGetopt || globalThis.GetoptAID) modules.push("AIDGetopt");
             if (globalThis.GetoptSandbox) modules.push("GetoptSandbox");
             if (globalThis.AutoCards) modules.push("AutoCards");
             if (globalThis.InnerEntity || globalThis.InnerSelf) modules.push("InnerEntity");
@@ -1031,11 +1036,11 @@ app.command("diag", {
 
         const lines = [
             "==================================================================",
-            "  ⚙️ GetoptAID System Diagnostics",
+            "  ⚙️ AID-Getopt System Diagnostics",
             "==================================================================",
             `  Parser:     ${diagStr}`,
             `  Lifecycle:  Multi-Tab Cooperative (Auto-Cards compatible)`,
-            `  Modules:    ${modules.length ? modules.join(", ") : "GetoptAID Standalone"}`,
+            `  Modules:    ${modules.length ? modules.join(", ") : "AID-Getopt Standalone"}`,
             `  State Key:  state.GetoptSandbox`
         ];
 
@@ -1113,7 +1118,7 @@ app.command("diag", {
 // Command 7: /test - In-Game Self-Test & Diagnostic Suite
 app.command("test", {
     aliases: ["selftest", "check", "verify"],
-    description: "Run in-game self-diagnostic test suite verifying GetoptAID operation on AI Dungeon",
+    description: "Run in-game self-diagnostic test suite verifying AID-Getopt operation on AI Dungeon",
     options: {
         "verbose|v": false,
         "help|h|?": false
@@ -1127,11 +1132,11 @@ app.command("test", {
                 "the AI Dungeon QuickJS environment to verify all parsers and routing."
             ].join("\n");
         }
-        const engine = (typeof globalThis !== "undefined" && globalThis.GetoptAID)
-            ? globalThis.GetoptAID
+        const engine = (typeof globalThis !== "undefined" && (globalThis.AIDGetopt || globalThis.GetoptAID))
+            ? (globalThis.AIDGetopt || globalThis.GetoptAID)
             : (typeof api !== "undefined" ? api : null);
         if (!engine || typeof engine.selfTest !== "function") {
-            return "⚠️ GetoptAID.selfTest engine not loaded.";
+            return "⚠️ AID-Getopt selfTest engine not loaded.";
         }
         const report = engine.selfTest({ verbose: flags.verbose });
         return report.formatted;

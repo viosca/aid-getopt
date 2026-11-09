@@ -1,8 +1,9 @@
 const assert = require("assert");
-const GetoptAID = require("../src/getopt-aid");
+const AIDGetopt = require("../src/aid-getopt");
+const GetoptAID = AIDGetopt;
 
 console.log("==================================================================");
-console.log("  TEST SUITE: GetoptAID (Layer 1 Option Parser & Layer 2 Router)");
+console.log("  TEST SUITE: AID-Getopt (Layer 1 Option Parser & Layer 2 Router)");
 console.log("==================================================================");
 
 // ============================================================================
@@ -265,13 +266,13 @@ console.log("\n--- Part 2: Layer 2 Multi-Script Command Router ---");
 // Part 3: In-Engine selfTest() Verification
 console.log("\n--- Part 3: In-Engine selfTest() Diagnostic Verification ---");
 {
-    const report = GetoptAID.selfTest();
+    const report = AIDGetopt.selfTest();
     assert.strictEqual(report.failed, 0, `Expected 0 failures, got ${report.failed}`);
     assert.strictEqual(report.passed, report.total, "All selfTest items should pass");
     assert(report.formatted.includes("ALL 10 TESTS PASSED"), "Formatted report should confirm success");
-    console.log("   ✔ GetoptAID.selfTest() executed cleanly with 100% success");
+    console.log("   ✔ AID-Getopt selfTest() executed cleanly with 100% success");
 }
 
 console.log("\n==================================================================");
-console.log("  🎉 ALL GetoptAID UNIT TESTS PASSED (100% SUCCESS)");
+console.log("  🎉 ALL AID-Getopt UNIT TESTS PASSED (100% SUCCESS)");
 console.log("==================================================================");

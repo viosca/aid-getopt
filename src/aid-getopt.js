@@ -1,31 +1,11 @@
-// ============================================================================
-//
-//                             USE THIS VERSION
-//
-//                      GetoptAID Library (Ver. 1.0.0)
-//
-//   Build Generation: 2026-11-09 03:52:47 UTC
-//   Git Commit:       1677426
-//   Repository:       https://github.com/viosca/aid-getopt
-//   License:          MIT (c) Randy Viosca (@Random_Variable)
-//
-//   Paste this whole file as your ENTIRE "Library" tab in AI Dungeon.
-//
-//   If publishing as a standalone script module on AI Dungeon:
-//   1. In scenario Details -> Player presentation -> toggle "Mark as Script" ON.
-//   2. In Scripts -> Library tab, paste this file.
-//   3. Now other creators can add GetoptAID to their scenario RUN ORDER!
-//
-// ============================================================================
-
 /**
- * GetoptAID - POSIX/GNU-Style Option Parser & Multi-Script Slash Command Router for AI Dungeon
+ * AID-Getopt - POSIX/GNU-Style Option Parser & Multi-Script Slash Command Router for AI Dungeon
  *
  * Architecture:
- * - Layer 1: Core Option Parser (GetoptAID.getopt / GetoptAID.parse)
+ * - Layer 1: Core Option Parser (AIDGetopt.getopt / AIDGetopt.parse)
  *   POSIX & GNU-style option parsing, Perl-style compact specs ("mode|m=s", "tags|t=s@"),
  *   array/hash accumulators, closures/action callbacks, and mobile typography tolerance.
- * - Layer 2: Command Router & Multi-Script Dispatcher (GetoptAID.cli / GetoptAID.CLI)
+ * - Layer 2: Command Router & Multi-Script Dispatcher (AIDGetopt.cli / AIDGetopt.CLI)
  *   Multi-command slash router with dialogue unwrapping and non-interfering pipeline passthrough
  *   (matched: false) for sequential script execution in AI Dungeon.
  *
@@ -37,14 +17,14 @@
     if (typeof module === "object" && module.exports) {
         module.exports = factory();
     } else {
-        root.GetoptAID = factory();
+        root.AIDGetopt = root.GetoptAID = factory();
     }
 })(typeof globalThis !== "undefined" ? globalThis : this, function() {
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "1677426";
-    const BUILD_TIME = "2026-11-09 03:52:47 UTC";
+    const GIT_HASH = "dev";
+    const BUILD_TIME = "dev";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -598,7 +578,7 @@
 
         const lines = [
             "==================================================================",
-            `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
+            `  🎯 AID-Getopt In-Game Self-Test Suite (v${VERSION})`,
             `  Build: ${GIT_HASH} [${BUILD_TIME}]`,
             "=================================================================="
         ];
@@ -634,7 +614,7 @@
      */
     function getInfo() {
         return {
-            name: "GetoptAID",
+            name: "AID-Getopt",
             version: VERSION,
             gitHash: GIT_HASH,
             buildTime: BUILD_TIME,
@@ -650,11 +630,11 @@
      * One-line summary for calling scripts' /version and /info commands.
      */
     function getDiag() {
-        return `GetoptAID v${VERSION} (${GIT_HASH}) [${BUILD_TIME}]`;
+        return `AID-Getopt v${VERSION} (${GIT_HASH}) [${BUILD_TIME}]`;
     }
 
     const api = {
-        name: "GetoptAID",
+        name: "AID-Getopt",
         version: VERSION,
         gitHash: GIT_HASH,
         buildTime: BUILD_TIME,
@@ -677,15 +657,20 @@
 
     // Safe global environment & module registry for AI Dungeon scripts
     if (typeof globalThis !== "undefined") {
-        (globalThis.AID_MODULES ??= {})["getopt-aid"] = {
-            name: "GetoptAID",
+        const modRecord = {
+            name: "AID-Getopt",
             version: VERSION,
             gitHash: GIT_HASH,
             buildTime: BUILD_TIME,
             diag: getDiag
         };
+        (globalThis.AID_MODULES ??= {})["aid-getopt"] = modRecord;
+        globalThis.AID_MODULES["getopt-aid"] = modRecord; // backward compatibility
+        if (!globalThis.AIDGetopt || globalThis.AIDGetopt.version < VERSION) {
+            globalThis.AIDGetopt = api;
+        }
         if (!globalThis.GetoptAID || globalThis.GetoptAID.version < VERSION) {
-            globalThis.GetoptAID = api;
+            globalThis.GetoptAID = api; // backward compatibility
         }
     }
 

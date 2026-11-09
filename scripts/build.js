@@ -7,8 +7,8 @@ const vm = require("vm");
 const { execSync } = require("child_process");
 
 const ROOT_DIR = path.resolve(__dirname, "..");
-const SRC_PATH = path.join(ROOT_DIR, "src", "getopt-aid.js");
-const OUTPUT_LIB_PATH = path.join(ROOT_DIR, "library-getopt-aid.js");
+const SRC_PATH = path.join(ROOT_DIR, "src", "aid-getopt.js");
+const OUTPUT_LIB_PATH = path.join(ROOT_DIR, "library-aid-getopt.js");
 const SANDBOX_SCRIPT_PATH = path.join(ROOT_DIR, "AID-sandbox", "sandbox-script.js");
 const PKG_PATH = path.join(ROOT_DIR, "package.json");
 
@@ -26,7 +26,7 @@ function getTimestamp() {
 
 function main() {
     console.log("==================================================================");
-    console.log("  BUILDING GetoptAID Distribution Artifacts");
+    console.log("  BUILDING AID-Getopt Distribution Artifacts");
     console.log("==================================================================");
 
     if (!fs.existsSync(SRC_PATH)) {
@@ -55,7 +55,7 @@ function main() {
 //
 //                             USE THIS VERSION
 //
-//                      GetoptAID Library (Ver. ${version})
+//                      AID-Getopt Library (Ver. ${version})
 //
 //   Build Generation: ${timestamp}
 //   Git Commit:       ${gitHash}
@@ -67,7 +67,7 @@ function main() {
 //   If publishing as a standalone script module on AI Dungeon:
 //   1. In scenario Details -> Player presentation -> toggle "Mark as Script" ON.
 //   2. In Scripts -> Library tab, paste this file.
-//   3. Now other creators can add GetoptAID to their scenario RUN ORDER!
+//   3. Now other creators can add AID-Getopt to their scenario RUN ORDER!
 //
 // ============================================================================
 
@@ -78,22 +78,22 @@ function main() {
     // Syntax validation
     try {
         new vm.Script(finalLibraryCode);
-        console.log("   ✔ Syntax validation passed for library-getopt-aid.js");
+        console.log("   ✔ Syntax validation passed for library-aid-getopt.js");
     } catch (err) {
-        console.error("   ✖ Syntax validation FAILED for library-getopt-aid.js:", err);
+        console.error("   ✖ Syntax validation FAILED for library-aid-getopt.js:", err);
         process.exit(1);
     }
 
-    // Write library-getopt-aid.js
+    // Write library-aid-getopt.js
     fs.writeFileSync(OUTPUT_LIB_PATH, finalLibraryCode, "utf8");
     const libLines = finalLibraryCode.split("\n").length;
     const libKb = (Buffer.byteLength(finalLibraryCode, "utf8") / 1024).toFixed(1);
-    console.log(`   ✔ Wrote library-getopt-aid.js (${libLines.toLocaleString()} lines, ${libKb} KB)`);
+    console.log(`   ✔ Wrote library-aid-getopt.js (${libLines.toLocaleString()} lines, ${libKb} KB)`);
 
     // Update AID-sandbox/sandbox-script.js embedded engine if it exists
     if (fs.existsSync(SANDBOX_SCRIPT_PATH)) {
         let sandboxCode = fs.readFileSync(SANDBOX_SCRIPT_PATH, "utf8");
-        const part1Regex = /(\/\/ =+\r?\n\/\/ PART 1: EMBEDDED GetoptAID ENGINE[\s\S]*?\r?\n\/\/ =+\r?\n)[\s\S]*?(\r?\n\/\/ =+\r?\n\/\/ PART 2: COMMAND DEFINITIONS)/;
+        const part1Regex = /(\/\/ =+\r?\n\/\/ PART 1: EMBEDDED (?:AID-Getopt|GetoptAID) ENGINE[\s\S]*?\r?\n\/\/ =+\r?\n)[\s\S]*?(\r?\n\/\/ =+\r?\n\/\/ PART 2: COMMAND DEFINITIONS)/;
         
         if (part1Regex.test(sandboxCode)) {
             sandboxCode = sandboxCode.replace(part1Regex, `$1${stamped}$2`);
@@ -112,7 +112,7 @@ function main() {
 
         const sandboxBanner = `// ============================================================================
 //
-//                      GetoptAID Sandbox Library
+//                      AID-Getopt Sandbox Library
 //
 //   Build Generation: ${timestamp}
 //   Git Commit:       ${gitHash}

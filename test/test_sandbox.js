@@ -65,7 +65,7 @@ console.log("   ✔ /stat hash accumulators (--meta%), trait tags (-t@), and HP 
 
 // 7. Test /help
 const r7 = runInput("/help");
-assert(r7.text.includes("GetoptAID Sandbox Command Center"), "Expected help header");
+assert(r7.text.includes("AID-Getopt Sandbox Command Center") || r7.text.includes("GetoptAID Sandbox Command Center"), "Expected help header");
 assert(r7.text.includes("/roll"), "Expected /roll in help");
 assert(r7.text.includes("/inv"), "Expected /inv in help");
 assert(r7.text.includes("/stat"), "Expected /stat in help");
@@ -76,14 +76,14 @@ console.log("   ✔ /help master reference generated");
 
 // 7b. Test /version
 const r7b = runInput("/version");
-assert(r7b.text.includes("GetoptAID Build Information"), "Expected Build Information in /version");
+assert(r7b.text.includes("AID-Getopt Build Information") || r7b.text.includes("GetoptAID Build Information"), "Expected Build Information in /version");
 assert(r7b.text.includes("Version:    v1.0.0"), "Expected version in /version");
 console.log("   ✔ /version command verified");
 
 // 7c. Test /diag
 sandbox.state.memory = { context: "The mountain roads are treacherous.", frontMemory: "Class: Ranger" };
 const r7c = runInput("/diag");
-assert(r7c.text.includes("GetoptAID System Diagnostics"), "Expected Diagnostics header in /diag");
+assert(r7c.text.includes("AID-Getopt System Diagnostics") || r7c.text.includes("GetoptAID System Diagnostics"), "Expected Diagnostics header in /diag");
 assert(r7c.text.includes("Parser:"), "Expected Parser info in /diag");
 console.log("   ✔ /diag command verified");
 
@@ -106,16 +106,16 @@ console.log("   ✔ /diag -m (--memory), -i (--info), and -a (--all) verified");
 
 // 8. Test /test (In-Game Self-Test)
 const r8 = runInput("/test");
-assert(r8.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header");
+assert(r8.text.includes("AID-Getopt In-Game Self-Test Suite") || r8.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header");
 assert(r8.text.includes("ALL 10 TESTS PASSED"), "Expected all tests passed in report");
 
 // 8b. Test AID Do mode formatting: "> You /test."
 const r8b = runInput("> You /test.");
-assert(r8b.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from Do mode with period");
+assert(r8b.text.includes("AID-Getopt In-Game Self-Test Suite") || r8b.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from Do mode with period");
 
 // 8c. Test trailing period: "/test."
 const r8c = runInput("/test.");
-assert(r8c.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from /test.");
+assert(r8c.text.includes("AID-Getopt In-Game Self-Test Suite") || r8c.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from /test.");
 
 console.log("   ✔ /test in-game self-diagnostic suite executed with 100% success (including Do mode & periods)");
 
@@ -192,7 +192,7 @@ console.log("=================================================================="
     const inRes1 = runHook(inputCode, "> You /test.");
     assert.strictEqual(inRes1.text, "> You /test.", "Input hook must preserve player action text for clean display");
     assert.strictEqual(inRes1.stop, undefined, "Input hook must NOT return stop property");
-    assert(sharedContext.state.GetoptSandbox.commandOutput.includes("GetoptAID In-Game Self-Test Suite"), "Input hook must store command output in state for Output hook");
+    assert(sharedContext.state.GetoptSandbox.commandOutput.includes("AID-Getopt In-Game Self-Test Suite") || sharedContext.state.GetoptSandbox.commandOutput.includes("GetoptAID In-Game Self-Test Suite"), "Input hook must store command output in state for Output hook");
     console.log("   ✔ Input hook processed /test cleanly and staged command output for Output hook");
 
     // 2. Run Context hook (pre-LLM)
@@ -202,7 +202,7 @@ console.log("=================================================================="
 
     // 3. Run Output hook (replaces model generation with formatted story Markdown)
     const outRes1 = runHook(outputCode, "Accidental LLM text");
-    assert(outRes1.text.includes("GetoptAID In-Game Self-Test Suite"), "Output hook must emit command output as Story Markdown");
+    assert(outRes1.text.includes("AID-Getopt In-Game Self-Test Suite") || outRes1.text.includes("GetoptAID In-Game Self-Test Suite"), "Output hook must emit command output as Story Markdown");
     assert(outRes1.text.includes("Build:"), "Output hook must display build hash and timestamp");
     assert(outRes1.text.includes("=================================================================="), "Output hook preserves terminal borders");
     assert.strictEqual(sharedContext.state.GetoptSandbox.commandOutput, undefined, "Output hook cleared commandOutput flag");
