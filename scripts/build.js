@@ -140,7 +140,7 @@ function main() {
 //        };
 //        modifier(text);
 //
-//   Halts the AI engine on Context to eliminate 100% of LLM churn on commands!
+//   Eliminates 100% of LLM churn on commands via Auto-Cards cooperative lifecycle!
 //
 // ============================================================================
 
