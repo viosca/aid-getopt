@@ -81,10 +81,28 @@ assert(r7b.text.includes("Version:    v1.0.0"), "Expected version in /version");
 console.log("   ✔ /version command verified");
 
 // 7c. Test /diag
+sandbox.state.memory = { context: "The mountain roads are treacherous.", frontMemory: "Class: Ranger" };
 const r7c = runInput("/diag");
 assert(r7c.text.includes("GetoptAID System Diagnostics"), "Expected Diagnostics header in /diag");
 assert(r7c.text.includes("Parser:"), "Expected Parser info in /diag");
 console.log("   ✔ /diag command verified");
+
+// 7d. Test /diag -m and /diag --memory
+const r7d = runInput("/diag -m");
+assert(r7d.text.includes("state.memory Inspection"), "Expected state.memory inspection in /diag -m");
+assert(r7d.text.includes("The mountain roads are treacherous"), "Expected context content in /diag -m");
+
+const r7d2 = runInput("/diag --memory");
+assert(r7d2.text.includes("state.memory Inspection"), "Expected state.memory inspection in /diag --memory");
+
+const r7e = runInput("/diag -i");
+assert(r7e.text.includes("info Inspection"), "Expected info inspection in /diag -i");
+
+const r7f = runInput("/diag -a");
+assert(r7f.text.includes("state.memory Inspection"), "Expected state.memory in /diag -a");
+assert(r7f.text.includes("info Inspection"), "Expected info in /diag -a");
+assert(r7f.text.includes("state Keys"), "Expected state keys in /diag -a");
+console.log("   ✔ /diag -m (--memory), -i (--info), and -a (--all) verified");
 
 // 8. Test /test (In-Game Self-Test)
 const r8 = runInput("/test");

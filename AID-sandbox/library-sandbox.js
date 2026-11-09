@@ -2,8 +2,8 @@
 //
 //                      GetoptAID Sandbox Library
 //
-//   Build Generation: 2026-11-09 02:42:02 UTC
-//   Git Commit:       52e8a54
+//   Build Generation: 2026-11-09 02:51:26 UTC
+//   Git Commit:       1f6142e
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -60,8 +60,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "52e8a54";
-    const BUILD_TIME = "2026-11-09 02:42:02 UTC";
+    const GIT_HASH = "1f6142e";
+    const BUILD_TIME = "2026-11-09 02:51:26 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -996,13 +996,22 @@ app.command("diag", {
     aliases: ["diagnostics", "d"],
     description: "Display runtime environment, loaded modules, and state diagnostics",
     options: {
+        "memory|m": false,
+        "info|i": false,
+        "state|s": false,
+        "all|a": false,
         "help|h|?": false
     },
-    action: (flags) => {
+    action: (flags, operands, target, context) => {
         if (flags.help) {
             return [
                 "⚙️ [DIAGNOSTICS HELP]",
-                "Usage: /diag (or /diagnostics, /d)",
+                "Usage: /diag [-m, --memory] [-i, --info] [-s, --state] [-a, --all]",
+                "Options:",
+                "  -m, --memory   Inspect state.memory structure and contents",
+                "  -i, --info     Inspect info object (model settings, maxChars, slider)",
+                "  -s, --state    Inspect active state keys and object types",
+                "  -a, --all      Dump full diagnostic inspection of state and info",
                 "Displays system diagnostics, active global scripts, and pipeline state."
             ].join("\n");
         }
@@ -1019,16 +1028,85 @@ app.command("diag", {
             if (globalThis.AutoCards) modules.push("AutoCards");
             if (globalThis.InnerEntity || globalThis.InnerSelf) modules.push("InnerEntity");
         }
-        return [
+
+        const lines = [
             "==================================================================",
             "  ⚙️ GetoptAID System Diagnostics",
             "==================================================================",
             `  Parser:     ${diagStr}`,
             `  Lifecycle:  Multi-Tab Cooperative (Auto-Cards compatible)`,
             `  Modules:    ${modules.length ? modules.join(", ") : "GetoptAID Standalone"}`,
-            `  State Key:  state.GetoptSandbox`,
-            "=================================================================="
-        ].join("\n");
+            `  State Key:  state.GetoptSandbox`
+        ];
+
+        const st = (typeof state !== "undefined" ? state : context?.state);
+        const inf = (typeof info !== "undefined" ? info : context?.info);
+
+        const formatInspect = (label, val) => {
+            if (val === undefined) return `  ${label}: (undefined)`;
+            if (val === null) return `  ${label}: null`;
+            if (typeof val === "string") return `  ${label}: "${val}" (${val.length} chars)`;
+            if (typeof val !== "object") return `  ${label}: ${String(val)}`;
+            try {
+                const json = JSON.stringify(val, null, 2);
+                return [
+                    `  ${label}: (${Array.isArray(val) ? "Array[" + val.length + "]" : "Object"})`,
+                    ...json.split("\n").map(l => "    " + l)
+                ].join("\n");
+            } catch (_) {
+                return `  ${label}: [Object: ${Object.keys(val).join(", ")}]`;
+            }
+        };
+
+        const showMemory = flags.memory || flags.all;
+        const showInfo = flags.info || flags.all;
+        const showState = flags.state || flags.all;
+
+        if (showMemory) {
+            lines.push("------------------------------------------------------------------");
+            lines.push("  🧠 state.memory Inspection:");
+            if (!st) {
+                lines.push("  state: (undefined in current scope)");
+            } else {
+                lines.push(formatInspect("state.memory", st.memory));
+            }
+        }
+
+        if (showInfo) {
+            lines.push("------------------------------------------------------------------");
+            lines.push("  ℹ️ info Inspection (Settings & Model):");
+            if (!inf) {
+                lines.push("  info: (undefined in current scope)");
+            } else {
+                lines.push(formatInspect("info", inf));
+            }
+        }
+
+        if (showState) {
+            lines.push("------------------------------------------------------------------");
+            lines.push("  📦 state Keys & Types:");
+            if (!st) {
+                lines.push("  state: (undefined in current scope)");
+            } else {
+                const keys = Object.keys(st);
+                lines.push(`  Keys (${keys.length}): ${keys.join(", ") || "(none)"}`);
+                for (const k of keys) {
+                    if (k !== "GetoptSandbox") {
+                        const val = st[k];
+                        const t = Array.isArray(val) ? `Array[${val.length}]` : typeof val;
+                        lines.push(`  • state.${k}: (${t})`);
+                    }
+                }
+            }
+        }
+
+        if (!showMemory && !showInfo && !showState) {
+            lines.push("------------------------------------------------------------------");
+            lines.push("  Tip: Use '/diag -m' to inspect state.memory, or '/diag -h' for options");
+        }
+
+        lines.push("==================================================================");
+        return lines.join("\n");
     }
 });
 
