@@ -2,8 +2,8 @@
 //
 //                      GetoptAID Sandbox Library
 //
-//   Build Generation: 2026-11-09 01:49:10 UTC
-//   Git Commit:       d466006
+//   Build Generation: 2026-11-09 02:20:39 UTC
+//   Git Commit:       0fa8f80
 //   Repository:       https://github.com/viosca/aid-getopt
 //   License:          MIT (c) Randy Viosca (@Random_Variable)
 //
@@ -60,8 +60,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "d466006";
-    const BUILD_TIME = "2026-11-09 01:49:10 UTC";
+    const GIT_HASH = "0fa8f80";
+    const BUILD_TIME = "2026-11-09 02:20:39 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -1029,11 +1029,13 @@ function GetoptSandbox(inHook, inText, inStop) {
             });
             if (result.matched) {
                 _aidLog("✔ [GetoptSandbox:Input] Command executed:", result.command);
-                // Command handled! Flag output hook to discard model generation (Auto-Cards style)
+                // Store command output for the output hook (story text).
+                // In AI Dungeon, story text (Output) renders Markdown and preserves newlines,
+                // whereas action text (Input) collapses newlines into spaces and strips Markdown.
                 if (typeof state !== "undefined" && state.GetoptSandbox) {
-                    state.GetoptSandbox.discardOutput = true;
+                    state.GetoptSandbox.commandOutput = result.output || "\n";
                 }
-                return result.output ? `\n\n${result.output}\n\n` : "\n";
+                return TEXT;
             }
             _aidLog("ℹ️ [GetoptSandbox:Input] Text is not a recognized command; passing through.");
             // Not our command: pass through untouched for downstream scripts or story engine
@@ -1046,11 +1048,11 @@ function GetoptSandbox(inHook, inText, inStop) {
         }
 
         case "output": {
-            if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.discardOutput) {
-                state.GetoptSandbox.discardOutput = false;
-                _aidLog("📤 [GetoptSandbox:Output] Model output suppressed with newline (Auto-Cards style).");
-                // Discard model output with a single newline (identical to Auto-Cards output replacement)
-                return "\n";
+            if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.commandOutput !== undefined) {
+                const out = state.GetoptSandbox.commandOutput;
+                delete state.GetoptSandbox.commandOutput;
+                _aidLog("📤 [GetoptSandbox:Output] Emitted command output in story text (Markdown preserved).");
+                return out ? `\n\n${out}\n\n` : "\n";
             }
             return TEXT;
         }

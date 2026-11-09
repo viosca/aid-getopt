@@ -156,23 +156,24 @@ console.log("=================================================================="
     console.log("   ✔ Turn 0 (Scenario Start): Context hook safely ran with stop undefined (no ReferenceError!)");
 
     // Turn 1: Player executes /test in Do mode ("> You /test.")
-    // 1. Run Input hook
+    // 1. Run Input hook: preserves action text, stores command output in state
     const inRes1 = runHook(inputCode, "> You /test.");
-    assert(inRes1.text.includes("GetoptAID In-Game Self-Test Suite"), "Input hook executed /test command");
+    assert.strictEqual(inRes1.text, "> You /test.", "Input hook must preserve player action text for clean display");
     assert.strictEqual(inRes1.stop, undefined, "Input hook must NOT return stop property");
-    assert.strictEqual(sharedContext.state.GetoptSandbox.discardOutput, true, "Input hook must set discardOutput flag in state");
-    console.log("   ✔ Input hook processed /test cleanly and flagged output discard");
+    assert(sharedContext.state.GetoptSandbox.commandOutput.includes("GetoptAID In-Game Self-Test Suite"), "Input hook must store command output in state for Output hook");
+    console.log("   ✔ Input hook processed /test cleanly and staged command output for Output hook");
 
     // 2. Run Context hook (pre-LLM)
     const ctxRes1 = runHook(contextCode, inRes1.text, false);
     assert.strictEqual(ctxRes1.stop, false, "Context hook passes through stop: false so that onOutput hook runs");
     console.log("   ✔ Context hook passed through cleanly (Auto-Cards style)");
 
-    // 3. Run Output hook (wipes model generation)
+    // 3. Run Output hook (replaces model generation with formatted story Markdown)
     const outRes1 = runHook(outputCode, "Accidental LLM text");
-    assert.strictEqual(outRes1.text, "\n", "Output hook discarded LLM output with newline");
-    assert.strictEqual(sharedContext.state.GetoptSandbox.discardOutput, false, "Output hook reset discardOutput flag");
-    console.log("   ✔ Output hook discarded model generation with newline (ZERO model text shown!)");
+    assert(outRes1.text.includes("GetoptAID In-Game Self-Test Suite"), "Output hook must emit command output as Story Markdown");
+    assert(outRes1.text.includes("```"), "Output hook preserves code fences");
+    assert.strictEqual(sharedContext.state.GetoptSandbox.commandOutput, undefined, "Output hook cleared commandOutput flag");
+    console.log("   ✔ Output hook emitted command output in story text (intact Markdown & newlines, ZERO model churn!)");
 
     // Turn 2: Player inputs normal story narrative ("You look across the room.")
     const inRes2 = runHook(inputCode, "You look across the room.");
