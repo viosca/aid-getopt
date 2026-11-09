@@ -577,7 +577,6 @@
         const total = results.length;
 
         const lines = [
-            "```",
             "==================================================================",
             `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
             `  Build: ${GIT_HASH} [${BUILD_TIME}]`,
@@ -600,7 +599,6 @@
             lines.push(`  ⚠️ ${failed} OF ${total} TESTS FAILED`);
         }
         lines.push("==================================================================");
-        lines.push("```");
 
         return {
             passed,

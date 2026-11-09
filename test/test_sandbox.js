@@ -185,9 +185,10 @@ console.log("=================================================================="
     // 3. Run Output hook (replaces model generation with formatted story Markdown)
     const outRes1 = runHook(outputCode, "Accidental LLM text");
     assert(outRes1.text.includes("GetoptAID In-Game Self-Test Suite"), "Output hook must emit command output as Story Markdown");
-    assert(outRes1.text.includes("```"), "Output hook preserves code fences");
+    assert(outRes1.text.includes("Build:"), "Output hook must display build hash and timestamp");
+    assert(outRes1.text.includes("=================================================================="), "Output hook preserves terminal borders");
     assert.strictEqual(sharedContext.state.GetoptSandbox.commandOutput, undefined, "Output hook cleared commandOutput flag");
-    console.log("   ✔ Output hook emitted command output in story text (intact Markdown & newlines, ZERO model churn!)");
+    console.log("   ✔ Output hook emitted command output in story text (clean borders & newlines, ZERO model churn!)");
 
     // Turn 2: Player inputs normal story narrative ("You look across the room.")
     const inRes2 = runHook(inputCode, "You look across the room.");

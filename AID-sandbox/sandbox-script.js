@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "2f32cae";
-    const BUILD_TIME = "2026-11-09 02:37:17 UTC";
+    const GIT_HASH = "52e8a54";
+    const BUILD_TIME = "2026-11-09 02:42:02 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -600,7 +600,6 @@
         const total = results.length;
 
         const lines = [
-            "```",
             "==================================================================",
             `  🎯 GetoptAID In-Game Self-Test Suite (v${VERSION})`,
             `  Build: ${GIT_HASH} [${BUILD_TIME}]`,
@@ -623,7 +622,6 @@
             lines.push(`  ⚠️ ${failed} OF ${total} TESTS FAILED`);
         }
         lines.push("==================================================================");
-        lines.push("```");
 
         return {
             passed,
@@ -929,7 +927,6 @@ app.command("help", {
     description: "Display command manuals and examples",
     action: (flags, operands, target) => {
         return [
-            "```",
             "==================================================================",
             "  🎯 GetoptAID Sandbox Command Center",
             "==================================================================",
@@ -941,8 +938,7 @@ app.command("help", {
             "  • Type '/<cmd> --help' for options on any command (e.g. /roll -h)",
             "  • Commands work in Do, Say, or Story mode",
             "  • Normal speech & story prose pass through untouched to other scripts!",
-            "==================================================================",
-            "```"
+            "=================================================================="
         ].join("\n");
     }
 });
@@ -969,7 +965,6 @@ app.command("version", {
             ? engine.info()
             : { version: "1.0.0", gitHash: "unknown", buildTime: "unknown", environment: "AI Dungeon QuickJS" };
         return [
-            "```",
             "==================================================================",
             "  🎯 GetoptAID Build Information",
             "==================================================================",
@@ -977,8 +972,7 @@ app.command("version", {
             `  Git Commit: ${info.gitHash}`,
             `  Build Time: ${info.buildTime}`,
             `  Runtime:    ${info.environment || "AI Dungeon QuickJS"}`,
-            "==================================================================",
-            "```"
+            "=================================================================="
         ].join("\n");
     }
 });
@@ -1012,7 +1006,6 @@ app.command("diag", {
             if (globalThis.InnerEntity || globalThis.InnerSelf) modules.push("InnerEntity");
         }
         return [
-            "```",
             "==================================================================",
             "  ⚙️ GetoptAID System Diagnostics",
             "==================================================================",
@@ -1020,8 +1013,7 @@ app.command("diag", {
             `  Lifecycle:  Multi-Tab Cooperative (Auto-Cards compatible)`,
             `  Modules:    ${modules.length ? modules.join(", ") : "GetoptAID Standalone"}`,
             `  State Key:  state.GetoptSandbox`,
-            "==================================================================",
-            "```"
+            "=================================================================="
         ].join("\n");
     }
 });
@@ -1119,8 +1111,8 @@ function GetoptSandbox(inHook, inText, inStop) {
             if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.commandOutput !== undefined) {
                 const out = state.GetoptSandbox.commandOutput;
                 delete state.GetoptSandbox.commandOutput;
-                _aidLog("📤 [GetoptSandbox:Output] Emitted command output in story text (Markdown preserved).");
-                return out ? `\n\n${out}\n\n` : "\n";
+                _aidLog("📤 [GetoptSandbox:Output] Emitted command output in story text (clean spacing).");
+                return out ? `${out.trim()}\n` : "\n";
             }
             return TEXT;
         }
@@ -1143,7 +1135,7 @@ const modifier = (text) => {
     if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.commandOutput !== undefined) {
         const out = state.GetoptSandbox.commandOutput;
         delete state.GetoptSandbox.commandOutput;
-        return { text: out ? `\n\n${out}\n\n` : "\n" };
+        return { text: out ? `${out.trim()}\n` : "\n" };
     }
     return { text };
 };
