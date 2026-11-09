@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "225a481";
-    const BUILD_TIME = "2026-11-09 16:20:34 UTC";
+    const GIT_HASH = "afc4f75";
+    const BUILD_TIME = "2026-11-09 16:24:59 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
