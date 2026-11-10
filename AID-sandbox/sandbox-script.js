@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "9ccb224";
-    const BUILD_TIME = "2026-11-10 19:03:52 UTC";
+    const GIT_HASH = "29d4a69";
+    const BUILD_TIME = "2026-11-10 19:11:49 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -990,6 +990,7 @@ app.command("diag", {
         "memory|m": false,
         "info|i": false,
         "state|s": false,
+        "context|c": false,
         "all|a": false,
         "help|h|?": false
     },
@@ -997,11 +998,12 @@ app.command("diag", {
         if (flags.help) {
             return [
                 "⚙️ [DIAGNOSTICS HELP]",
-                "Usage: /diag [-m, --memory] [-i, --info] [-s, --state] [-a, --all]",
+                "Usage: /diag [-m, --memory] [-i, --info] [-s, --state] [-c, --context] [-a, --all]",
                 "Options:",
                 "  -m, --memory   Inspect state.memory structure and contents",
                 "  -i, --info     Inspect info object (model settings, maxChars, slider)",
                 "  -s, --state    Inspect active state keys and object types",
+                "  -c, --context  Inspect last model context payload received",
                 "  -a, --all      Dump full diagnostic inspection of state and info",
                 "Displays system diagnostics, active global scripts, and pipeline state."
             ].join("\n");
@@ -1052,6 +1054,7 @@ app.command("diag", {
         const showMemory = flags.memory || flags.all;
         const showInfo = flags.info || flags.all;
         const showState = flags.state || flags.all;
+        const showContext = flags.context || flags.all;
 
         if (showMemory) {
             lines.push("------------------------------------------------------------------");
@@ -1091,9 +1094,23 @@ app.command("diag", {
             }
         }
 
-        if (!showMemory && !showInfo && !showState) {
+        if (showContext) {
             lines.push("------------------------------------------------------------------");
-            lines.push("  Tip: Use '/diag -m' to inspect state.memory, or '/diag -h' for options");
+            lines.push("  📜 Model Context Inspection:");
+            const ctxLen = st?.GetoptSandbox?.lastContextLength || 0;
+            const ctx = st?.GetoptSandbox?.lastContext;
+            lines.push(`  Length: ${ctxLen} chars`);
+            if (ctx) {
+                const preview = ctx.length > 400 ? ctx.slice(0, 400) + "..." : ctx;
+                lines.push("  Snippet:\n" + preview.split("\n").map(l => "    " + l).join("\n"));
+            } else {
+                lines.push("  (No model context captured yet)");
+            }
+        }
+
+        if (!showMemory && !showInfo && !showState && !showContext) {
+            lines.push("------------------------------------------------------------------");
+            lines.push("  Tip: Use '/diag -c' to inspect context, '/diag -m' for memory, or '/diag -h' for options");
         }
 
         lines.push("==================================================================");
@@ -1171,7 +1188,10 @@ function GetoptSandbox(inHook, inText, inStop) {
         }
 
         case "context": {
-            // Context passes through cleanly to ensure the onOutput hook runs
+            if (typeof state !== "undefined" && state.GetoptSandbox) {
+                state.GetoptSandbox.lastContextLength = TEXT.length;
+                state.GetoptSandbox.lastContext = TEXT;
+            }
             return [TEXT, STOP];
         }
 
