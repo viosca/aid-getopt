@@ -5,6 +5,7 @@
 [![Node.js CI](https://img.shields.io/badge/tests-100%25%20passing-brightgreen.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0-success.svg)]()
+[![Specification: AMS v1.1.0](https://img.shields.io/badge/spec-AMS%20v1.1.0-purple.svg)](https://github.com/viosca/aid-modules/blob/main/SPECIFICATION.md)
 
 > Lightweight POSIX/GNU option parser and multi-script slash-command router built specifically for **AI Dungeon** and interactive fiction scripting.
 
