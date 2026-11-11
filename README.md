@@ -1,4 +1,6 @@
-# GetoptAID 🎯
+# AID-Getopt 🎯
+
+![aid-getopt Hero Banner](assets/aid-getopt-banner.jpg)
 
 [![Node.js CI](https://img.shields.io/badge/tests-100%25%20passing-brightgreen.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -6,17 +8,17 @@
 
 > Lightweight POSIX/GNU option parser and multi-script slash-command router built specifically for **AI Dungeon** and interactive fiction scripting.
 
-**GetoptAID** brings the power and expressive ergonomics of Perl's `Getopt::Long` to AI Dungeon scripting. It is designed from the ground up to solve the real-world friction of mobile keyboards, character name collisions, and AI Dungeon's **sequential multi-script execution pipeline**.
+**AID-Getopt** brings the power and expressive ergonomics of Perl's `Getopt::Long` to AI Dungeon scripting. It is designed from the ground up to solve the real-world friction of mobile keyboards, character name collisions, and AI Dungeon's **sequential multi-script execution pipeline**.
 
 ---
 
-## 🌟 Why GetoptAID?
+## 🌟 Why AID-Getopt?
 
 AI Dungeon scripting presents unique challenges that standard desktop CLI parsers cannot handle:
 
-1. **Multi-Script Execution Waterfall**: AI Dungeon allows scenario creators and adventure players to stack multiple independent scripts (e.g. a dice roller + an inventory tracker + a lore engine). If a script aggressively hijacks or crashes on unfamiliar input, downstream scripts never receive their commands. GetoptAID provides **non-interfering passthrough** (`{ matched: false }`), ensuring seamless multi-creator script harmony.
-2. **Mobile Typography Tolerance**: Mobile keyboards automatically convert `--` into em-dashes (`—`) or en-dashes (`–`), and straight quotes into curly quotes (`“` `”`). GetoptAID normalizes all smart punctuation before parsing.
-3. **Dialogue Quoting**: Players frequently type slash commands inside dialogue quotes (e.g. `Joe says, "/ec -p Molly."` or `> You say, "/roll -d 20"`). GetoptAID unrolls the speech envelope, strips sentence-ending punctuation, and leaves narrative text intact.
+1. **Multi-Script Execution Waterfall**: AI Dungeon allows scenario creators and adventure players to stack multiple independent scripts (e.g. a dice roller + an inventory tracker + a lore engine). If a script aggressively hijacks or crashes on unfamiliar input, downstream scripts never receive their commands. AID-Getopt provides **non-interfering passthrough** (`{ matched: false }`), ensuring seamless multi-creator script harmony.
+2. **Mobile Typography Tolerance**: Mobile keyboards automatically convert `--` into em-dashes (`—`) or en-dashes (`–`), and straight quotes into curly quotes (`“` `”`). AID-Getopt normalizes all smart punctuation before parsing.
+3. **Dialogue Quoting**: Players frequently type slash commands inside dialogue quotes (e.g. `Joe says, "/ec -p Molly."` or `> You say, "/roll -d 20"`). AID-Getopt unrolls the speech envelope, strips sentence-ending punctuation, and leaves narrative text intact.
 4. **Name Collisions**: Bareword subcommands (`/ec mode Molly`) cause fatal ambiguity when an adventure has a character, faction, or item named "Mode", "Preset", or "Help". POSIX/GNU flags (`-m`, `--mode`) eliminate this ambiguity completely.
 5. **Zero Dependencies**: Single clean file (`~460` lines of pure JavaScript) with zero runtime dependencies. Runs identically in Node.js, the AI Dungeon browser sandbox, or bundled with Webpack / esbuild / Rollup.
 
@@ -24,7 +26,7 @@ AI Dungeon scripting presents unique challenges that standard desktop CLI parser
 
 ## 🏗️ Architecture: Two Decoupled Layers
 
-GetoptAID is split into two independent layers to fit any script design:
+AID-Getopt is split into two independent layers to fit any script design:
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -32,14 +34,14 @@ GetoptAID is split into two independent layers to fit any script design:
 └─────────────────────────────────┬────────────────────────────────┘
                                   ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│  Layer 2: Multi-Script Command Router (GetoptAID.cli)            │
+│  Layer 2: Multi-Script Command Router (AIDGetopt.cli)            │
 │  - Unwraps dialogue wrappers                                     │
 │  - Matches registered slash command (/ec)                        │
 │  - PASSES THROUGH unrecognized commands ({ matched: false })      │
 └─────────────────────────────────┬────────────────────────────────┘
                                   ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│  Layer 1: Core Option Parser (GetoptAID.getopt)                  │
+│  Layer 1: Core Option Parser (AIDGetopt.getopt)                  │
 │  - Normalizes smart dashes (—, –) and smart quotes (“ ”)          │
 │  - Parses POSIX short flags (-v, -m) & GNU long flags (--mode)    │
 │  - Supports Perl-style compact specs ("mode|m=s", "tags|t=s@")   │
@@ -48,8 +50,8 @@ GetoptAID is split into two independent layers to fit any script design:
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-- **Layer 1 (`GetoptAID.getopt`)**: For scripts that only need options parsing for a single command or custom input. Does not care about slash prefixes or subcommands.
-- **Layer 2 (`GetoptAID.cli`)**: For comprehensive scripting suites with multiple slash commands, subcommands, aliases, help generators, and multi-script pipeline passthrough.
+- **Layer 1 (`AIDGetopt.getopt`)**: For scripts that only need options parsing for a single command or custom input. Does not care about slash prefixes or subcommands.
+- **Layer 2 (`AIDGetopt.cli`)**: For comprehensive scripting suites with multiple slash commands, subcommands, aliases, help generators, and multi-script pipeline passthrough.
 
 ---
 
@@ -106,7 +108,7 @@ console.log(result.operands); // ['Molly']
 Build a complete slash-command suite with multiple commands:
 
 ```javascript
-const { cli } = require("getopt-aid");
+const { cli } = require("aid-getopt");
 
 const app = cli();
 
@@ -150,11 +152,11 @@ console.log(res.output);  // "Rolled d6+2: 7"
 ---
 
 ### 3. AI Dungeon Sequential Multi-Script Pipeline
-In AI Dungeon, multiple scripts run in a waterfall. When a command is not meant for your script, GetoptAID cleanly returns `{ matched: false }` so other scripts can handle it:
+In AI Dungeon, multiple scripts run in a waterfall. When a command is not meant for your script, AID-Getopt cleanly returns `{ matched: false }` so other scripts can handle it:
 
 ```javascript
 // In your AI Dungeon onInput modifier script:
-const app = GetoptAID.cli();
+const app = AIDGetopt.cli();
 
 app.command("mycmd", {
     action: (flags, operands) => {
@@ -196,7 +198,7 @@ const spec = {
     }
 };
 
-const result = GetoptAID.getopt("--scale 50 --clear", spec);
+const result = AIDGetopt.getopt("--scale 50 --clear", spec);
 console.log(result.flags.scale);   // 50
 console.log(result.flags.cleared); // true
 console.log(result.output);        // "Cache cleared successfully."
@@ -221,7 +223,7 @@ console.log(result.output);        // "Cache cleared successfully."
 
 ## 📱 Mobile Keyboard & Typographic Normalization
 
-GetoptAID transparently handles mobile typing artifacts:
+AID-Getopt transparently handles mobile typing artifacts:
 - **Dashes**: `—` (em-dash) and `–` (en-dash) are converted to `--` and `-`.
 - **Quotes**: `“`, `”`, `‘`, `’` are converted to standard `"` and `'`.
 - **Dialogue Unwrapping**: `Joe says, "/cmd -flag"` is automatically unwrapped to `/cmd -flag`.
@@ -232,12 +234,12 @@ GetoptAID transparently handles mobile typing artifacts:
 
 ## 🧪 Testing & In-Game Diagnostics
 
-### In-Game Self-Test (`/test` or `GetoptAID.selfTest()`)
-GetoptAID includes a built-in diagnostic test runner that can execute directly inside AI Dungeon's QuickJS sandbox to kick the tires and verify all parser functions, mobile dash normalization, and multi-script routing:
+### In-Game Self-Test (`/test` or `AIDGetopt.selfTest()`)
+AID-Getopt includes a built-in diagnostic test runner that can execute directly inside AI Dungeon's QuickJS sandbox to kick the tires and verify all parser functions, mobile dash normalization, and multi-script routing:
 
 ```javascript
 // Run programmatically:
-const report = GetoptAID.selfTest();
+const report = AIDGetopt.selfTest();
 console.log(report.formatted);
 
 // Or via in-game slash command:
@@ -253,7 +255,7 @@ npm test
 
 ```
 ==================================================================
-  TEST SUITE: GetoptAID (Layer 1 Option Parser & Layer 2 Router)
+  TEST SUITE: AID-Getopt (Layer 1 Option Parser & Layer 2 Router)
 ==================================================================
 
 --- Part 1: Layer 1 Core Option Parser ---
@@ -271,7 +273,7 @@ npm test
    ✔ AI Dungeon multi-script pipeline simulation passed with 100% harmony
 
 --- Part 3: In-Engine selfTest() Diagnostic Verification ---
-   ✔ GetoptAID.selfTest() executed cleanly with 100% success
+   ✔ AIDGetopt.selfTest() executed cleanly with 100% success
 
 ==================================================================
   TESTING AID-SANDBOX SCRIPT INTEGRATION
