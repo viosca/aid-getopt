@@ -234,7 +234,7 @@ AID-Getopt transparently handles mobile typing artifacts:
 
 ## 🧪 Testing & In-Game Diagnostics
 
-### In-Game Self-Test (`/test` or `AIDGetopt.selfTest()`)
+### In-Game Self-Test (`/aid-getopt --test` or `AIDGetopt.selfTest()`)
 AID-Getopt includes a built-in diagnostic test runner that can execute directly inside AI Dungeon's QuickJS sandbox to kick the tires and verify all parser functions, mobile dash normalization, and multi-script routing:
 
 ```javascript
@@ -242,8 +242,8 @@ AID-Getopt includes a built-in diagnostic test runner that can execute directly 
 const report = AIDGetopt.selfTest();
 console.log(report.formatted);
 
-// Or via in-game slash command:
-// Player types: /test
+// Or via collision-proof in-game slash command:
+// Player types: /aid-getopt --test (or /aid-getopt -t)
 ```
 
 ### Local Automated Test Suite

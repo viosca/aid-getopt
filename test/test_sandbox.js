@@ -63,61 +63,60 @@ assert(sandbox.state.character.tags.includes("Eagle-Eyed"), "Tag added");
 assert.strictEqual(sandbox.state.character.hp, 85, "HP updated");
 console.log("   ✔ /stat hash accumulators (--meta%), trait tags (-t@), and HP verified");
 
-// 7. Test /help
+// 7. Test /help (Adventure Command Directory)
 const r7 = runInput("/help");
-assert(r7.text.includes("AID-Getopt Sandbox Command Center") || r7.text.includes("GetoptAID Sandbox Command Center"), "Expected help header");
+assert(r7.text.includes("ADVENTURE COMMAND DIRECTORY"), "Expected ADVENTURE COMMAND DIRECTORY in /help");
 assert(r7.text.includes("/roll"), "Expected /roll in help");
 assert(r7.text.includes("/inv"), "Expected /inv in help");
 assert(r7.text.includes("/stat"), "Expected /stat in help");
-assert(r7.text.includes("/test"), "Expected /test in help");
-assert(r7.text.includes("/version"), "Expected /version in help");
-assert(r7.text.includes("/diag"), "Expected /diag in help");
-console.log("   ✔ /help master reference generated");
+assert(r7.text.includes("/aid-getopt"), "Expected /aid-getopt in help");
+console.log("   ✔ /help master adventure command directory generated");
 
-// 7b. Test /version
-const r7b = runInput("/version");
-assert(r7b.text.includes("AID-Getopt Build Information") || r7b.text.includes("GetoptAID Build Information"), "Expected Build Information in /version");
-assert(r7b.text.includes("Version:    v1.0.0"), "Expected version in /version");
-console.log("   ✔ /version command verified");
+// 7b. Test /aid-getopt (status & overview)
+const r7b = runInput("/aid-getopt");
+assert(r7b.text.includes("AID-Getopt Router & Parser Status"), "Expected Status in /aid-getopt");
+assert(r7b.text.includes("Version:    v1.0.0"), "Expected version in /aid-getopt");
+console.log("   ✔ /aid-getopt status & version overview verified");
 
-// 7c. Test /diag
+// 7c. Test /aid-getopt --diag and alias /aid-getopts -d
 sandbox.state.memory = { context: "The mountain roads are treacherous.", frontMemory: "Class: Ranger" };
-const r7c = runInput("/diag");
-assert(r7c.text.includes("AID-Getopt System Diagnostics") || r7c.text.includes("GetoptAID System Diagnostics"), "Expected Diagnostics header in /diag");
-assert(r7c.text.includes("Parser:"), "Expected Parser info in /diag");
-console.log("   ✔ /diag command verified");
+const r7c = runInput("/aid-getopt --diag");
+assert(r7c.text.includes("AID-Getopt System Diagnostics"), "Expected Diagnostics header in /aid-getopt --diag");
+assert(r7c.text.includes("Parser:"), "Expected Parser info in /aid-getopt --diag");
 
-// 7d. Test /diag -m and /diag --memory
-const r7d = runInput("/diag -m");
-assert(r7d.text.includes("state.memory Inspection"), "Expected state.memory inspection in /diag -m");
-assert(r7d.text.includes("The mountain roads are treacherous"), "Expected context content in /diag -m");
+const r7cAlias = runInput("/aid-getopts -d");
+assert(r7cAlias.text.includes("AID-Getopt System Diagnostics"), "Expected Diagnostics in /aid-getopts -d");
+console.log("   ✔ /aid-getopt --diag and alias /aid-getopts -d verified");
 
-const r7d2 = runInput("/diag --memory");
-assert(r7d2.text.includes("state.memory Inspection"), "Expected state.memory inspection in /diag --memory");
+// 7d. Test /aid-getopt --diag -m and /aid-getopt --diag --memory
+const r7d = runInput("/aid-getopt --diag -m");
+assert(r7d.text.includes("state.memory Inspection"), "Expected state.memory inspection in /aid-getopt --diag -m");
+assert(r7d.text.includes("The mountain roads are treacherous"), "Expected context content in /aid-getopt --diag -m");
 
-const r7e = runInput("/diag -i");
-assert(r7e.text.includes("info Inspection"), "Expected info inspection in /diag -i");
+const r7e = runInput("/aid-getopt --diag -i");
+assert(r7e.text.includes("info Inspection"), "Expected info inspection in /aid-getopt --diag -i");
 
-const r7f = runInput("/diag -a");
-assert(r7f.text.includes("state.memory Inspection"), "Expected state.memory in /diag -a");
-assert(r7f.text.includes("info Inspection"), "Expected info in /diag -a");
-assert(r7f.text.includes("state Keys"), "Expected state keys in /diag -a");
-console.log("   ✔ /diag -m (--memory), -i (--info), and -a (--all) verified");
+const r7f = runInput("/aid-getopt --diag -a");
+assert(r7f.text.includes("state.memory Inspection"), "Expected state.memory in /aid-getopt --diag -a");
+assert(r7f.text.includes("info Inspection"), "Expected info in /aid-getopt --diag -a");
+assert(r7f.text.includes("state Keys"), "Expected state keys in /aid-getopt --diag -a");
+console.log("   ✔ /aid-getopt --diag -m (-memory), -i (-info), and -a (-all) verified");
 
-// 8. Test /test (In-Game Self-Test)
-const r8 = runInput("/test");
+// 8. Test /aid-getopt --test (In-Game Self-Test)
+const r8 = runInput("/aid-getopt --test");
 assert(r8.text.includes("AID-Getopt In-Game Self-Test Suite") || r8.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header");
 assert(r8.text.includes("ALL 10 TESTS PASSED"), "Expected all tests passed in report");
+console.log("   ✔ /aid-getopt --test self-test suite verified");
 
-// 8b. Test AID Do mode formatting: "> You /test."
-const r8b = runInput("> You /test.");
+// 8b. Test AID Do mode formatting: "> You /aid-getopt --test."
+const r8b = runInput("> You /aid-getopt --test.");
 assert(r8b.text.includes("AID-Getopt In-Game Self-Test Suite") || r8b.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from Do mode with period");
 
-// 8c. Test trailing period: "/test."
-const r8c = runInput("/test.");
-assert(r8c.text.includes("AID-Getopt In-Game Self-Test Suite") || r8c.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from /test.");
+// 8c. Test trailing period: "/aid-getopt --test."
+const r8c = runInput("/aid-getopt --test.");
+assert(r8c.text.includes("AID-Getopt In-Game Self-Test Suite") || r8c.text.includes("GetoptAID In-Game Self-Test Suite"), "Expected self-test header from /aid-getopt --test.");
 
-console.log("   ✔ /test in-game self-diagnostic suite executed with 100% success (including Do mode & periods)");
+console.log("   ✔ /aid-getopt --test executed with 100% success (including Do mode & periods)");
 
 // 9. Test unrecognized slash command passthrough (Multi-Script Pipeline)
 const r9 = runInput("/ec -p Molly -m entity");
@@ -187,13 +186,13 @@ console.log("=================================================================="
     assert.strictEqual(ctxTurn0.stop, false, "Turn 0 must not halt generation");
     console.log("   ✔ Turn 0 (Scenario Start): Context hook safely ran with stop undefined (no ReferenceError!)");
 
-    // Turn 1: Player executes /test in Do mode ("> You /test.")
+    // Turn 1: Player executes /aid-getopt --test in Do mode ("> You /aid-getopt --test.")
     // 1. Run Input hook: preserves action text, stores command output in state
-    const inRes1 = runHook(inputCode, "> You /test.");
-    assert.strictEqual(inRes1.text, "> You /test.", "Input hook must preserve player action text for clean display");
+    const inRes1 = runHook(inputCode, "> You /aid-getopt --test.");
+    assert.strictEqual(inRes1.text, "> You /aid-getopt --test.", "Input hook must preserve player action text for clean display");
     assert.strictEqual(inRes1.stop, undefined, "Input hook must NOT return stop property");
     assert(sharedContext.state.GetoptSandbox.commandOutput.includes("AID-Getopt In-Game Self-Test Suite") || sharedContext.state.GetoptSandbox.commandOutput.includes("GetoptAID In-Game Self-Test Suite"), "Input hook must store command output in state for Output hook");
-    console.log("   ✔ Input hook processed /test cleanly and staged command output for Output hook");
+    console.log("   ✔ Input hook processed /aid-getopt --test cleanly and staged command output for Output hook");
 
     // 2. Run Context hook (pre-LLM)
     const ctxRes1 = runHook(contextCode, inRes1.text, false);

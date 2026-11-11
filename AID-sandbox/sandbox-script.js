@@ -46,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "c9a8981";
-    const BUILD_TIME = "2026-11-11 01:12:38 UTC";
+    const GIT_HASH = "f7190f1";
+    const BUILD_TIME = "2026-11-11 04:24:41 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -685,6 +685,11 @@
             version: VERSION,
             gitHash: GIT_HASH,
             buildTime: BUILD_TIME,
+            author: "Randy Viosca (@Random_Variable)",
+            prefix: "/aid-getopt",
+            aliases: ["/aid-getopts"],
+            description: "POSIX/GNU option parser & multi-script slash command router",
+            helpSummary: "Router diagnostics and self-test suite (/aid-getopt --diag, /aid-getopt --test)",
             diag: getDiag
         };
         (globalThis.AID_MODULES ??= {})["aid-getopt"] = modRecord;
@@ -926,223 +931,310 @@ app.command("stat", {
     }
 });
 
-// Command 4: /help - Master Help Generator
+// Command 4: /help - Master Adventure Command Directory & Help Generator
 app.command("help", {
     aliases: ["h", "?"],
-    description: "Display command manuals and examples",
-    action: (flags, operands, target) => {
-        return [
-            "==================================================================",
-            "  🎯 AID-Getopt Sandbox Command Center",
-            "==================================================================",
-            app.help(),
-            "Tips:",
-            "  • Type '/test' to run the in-game self-diagnostic test suite",
-            "  • Type '/version' to view module version, git hash, and build timestamp",
-            "  • Type '/diag' to inspect active runtime environment and loaded modules",
-            "  • Type '/<cmd> --help' for options on any command (e.g. /roll -h)",
-            "  • Commands work in Do, Say, or Story mode",
-            "  • Normal speech & story prose pass through untouched to other scripts!",
-            "=================================================================="
-        ].join("\n");
-    }
-});
-
-// Command 5: /version - Engine Version & Git Hash
-app.command("version", {
-    aliases: ["ver", "v"],
-    description: "Display AID-Getopt engine build version, git hash, and release timestamp",
+    description: "Display active adventure commands, loaded modules, and manuals",
     options: {
         "help|h|?": false
     },
-    action: (flags) => {
-        if (flags.help) {
-            return [
-                "ℹ️ [VERSION HELP]",
-                "Usage: /version (or /ver, /v)",
-                "Displays the AID-Getopt engine version, git commit hash, and build date."
-            ].join("\n");
+    action: (flags, operands) => {
+        const target = (operands[0] || "").toLowerCase().replace(/^\/+/, "");
+
+        // If specific module or command help is requested (e.g. /help aid-getopt or /help roll)
+        if (target) {
+            if (target === "aid-getopt" || target === "aid-getopts") {
+                return [
+                    "==================================================================",
+                    "  ⚙️ /aid-getopt - Router Diagnostics & Engine Self-Test",
+                    "==================================================================",
+                    "Usage: /aid-getopt [--diag|-d] [--test|-t] [--version|-v] [--help|-h]",
+                    "Aliases: /aid-getopts",
+                    "Options:",
+                    "  --diag, -d     Run comprehensive system, memory, and state diagnostics",
+                    "  --test, -t     Run in-engine automated self-diagnostic test suite",
+                    "  --version, -v  Display engine build version, git commit, and runtime",
+                    "  --help, -h     Display this manual",
+                    "Tips:",
+                    "  • Inspect context payload: /aid-getopt --diag -c",
+                    "  • Inspect memory state:   /aid-getopt --diag -m",
+                    "  • Verbose self-tests:     /aid-getopt --test -v",
+                    "=================================================================="
+                ].join("\n");
+            }
+            if (app.commands.has(target)) {
+                const cmd = app.commands.get(target);
+                return [
+                    "==================================================================",
+                    `  📖 /${cmd.name} Command Manual`,
+                    "==================================================================",
+                    `Description: ${cmd.description || "(no description)"}`,
+                    cmd.aliases?.length ? `Aliases:     /${cmd.aliases.join(", /")}` : "",
+                    "=================================================================="
+                ].filter(Boolean).join("\n");
+            }
         }
-        const engine = (typeof globalThis !== "undefined" && (globalThis.AIDGetopt || globalThis.GetoptAID))
-            ? (globalThis.AIDGetopt || globalThis.GetoptAID)
-            : (typeof api !== "undefined" ? api : null);
-        const info = (engine && typeof engine.info === "function")
-            ? engine.info()
-            : { version: "1.0.0", gitHash: "unknown", buildTime: "unknown", environment: "AI Dungeon QuickJS" };
-        return [
+
+        // Build Master Adventure Command Directory
+        const lines = [
             "==================================================================",
-            "  🎯 AID-Getopt Build Information",
-            "==================================================================",
-            `  Version:    v${info.version}`,
-            `  Git Commit: ${info.gitHash}`,
-            `  Build Time: ${info.buildTime}`,
-            `  Runtime:    ${info.environment || "AI Dungeon QuickJS"}`,
+            "  🌟 ADVENTURE COMMAND DIRECTORY",
             "=================================================================="
-        ].join("\n");
+        ];
+
+        // 1. Inspect registered modules in AMS / globalThis.AID_MODULES
+        const mods = (typeof globalThis !== "undefined" && globalThis.AID_MODULES) ? globalThis.AID_MODULES : {};
+        const modEntries = Object.entries(mods).filter(([k, v]) => v && typeof v === "object" && k !== "getopt-aid");
+
+        const storyModules = [];
+        const infraModules = [];
+
+        for (const [key, mod] of modEntries) {
+            const prefix = mod.prefix || (key.startsWith("aid-") ? `/${key}` : null);
+            const summary = mod.helpSummary || mod.description || "Active AI Dungeon module";
+            const item = { name: mod.name || key, version: mod.version || "1.0.0", prefix, summary, aliases: mod.aliases || [] };
+
+            if (key === "aid-getopt" || key === "aid-modules" || key.startsWith("aid-")) {
+                infraModules.push(item);
+            } else {
+                storyModules.push(item);
+            }
+        }
+
+        if (storyModules.length > 0) {
+            lines.push("📖 Story & Gameplay Systems:");
+            for (const m of storyModules) {
+                const pfxStr = m.prefix ? `${m.prefix}${m.aliases?.length ? ` (or ${m.aliases.join(", ")})` : ""}` : `[${m.name}]`;
+                lines.push(`  ${pfxStr.padEnd(18)} - ${m.name} (v${m.version})`);
+                lines.push(`                     ${m.summary}`);
+            }
+            lines.push("");
+        }
+
+        // 2. Demo / local sandbox commands (if any)
+        const localCmds = [];
+        const seenNames = new Set(["help", "aid-getopt", "aid-getopts"]);
+        for (const [name, def] of app.commands) {
+            if (seenNames.has(name) || name === def.name && seenNames.has(def.name)) continue;
+            seenNames.add(name);
+            seenNames.add(def.name);
+            localCmds.push(def);
+        }
+
+        if (localCmds.length > 0) {
+            lines.push("🎲 Gameplay & Utility Commands:");
+            for (const c of localCmds) {
+                const aliasStr = c.aliases?.length ? ` (or /${c.aliases.join(", /")})` : "";
+                lines.push(`  /${c.name}${aliasStr}`.padEnd(18) + ` - ${c.description || ""}`);
+            }
+            lines.push("");
+        }
+
+        // 3. Developer & Diagnostic Tools
+        lines.push("🛠️ Developer & Diagnostics:");
+        lines.push("  /aid-getopt        - Router diagnostics & engine self-tests (/aid-getopt --diag, --test)");
+        if (mods["aid-modules"]) {
+            lines.push("  /aid-modules       - View loaded system modules & versions (/aid-modules -v)");
+        }
+        lines.push("");
+        lines.push("Tips:");
+        lines.push("  • Type any system's command with 'help' (e.g. /ec help, /aid-getopt --help)");
+        lines.push("  • All commands operate safely in Do, Say, or Story mode.");
+        lines.push("  • Normal story prose passes through untouched down the script waterfall!");
+        lines.push("==================================================================");
+
+        return lines.join("\n");
     }
 });
 
-// Command 6: /diag - Runtime System Diagnostics
-app.command("diag", {
-    aliases: ["diagnostics", "d"],
-    description: "Display runtime environment, loaded modules, and state diagnostics",
+// Command 5: /aid-getopt - Low-Level Engine Diagnostics & Self-Tests
+app.command("aid-getopt", {
+    aliases: ["aid-getopts"],
+    description: "Display AID-Getopt router status, run diagnostics, or execute self-tests",
     options: {
+        "diag|d": false,
+        "test|t": false,
+        "version|v": false,
+        "help|h|?": false,
+        // Diag sub-flags
         "memory|m": false,
         "info|i": false,
         "state|s": false,
         "context|c": false,
         "all|a": false,
-        "help|h|?": false
+        // Test sub-flags
+        "verbose": false
     },
     action: (flags, operands, target, context) => {
-        if (flags.help) {
+        const sub = (operands[0] || "").toLowerCase();
+
+        // 1. Help
+        if (flags.help || sub === "help") {
             return [
-                "⚙️ [DIAGNOSTICS HELP]",
-                "Usage: /diag [-m, --memory] [-i, --info] [-s, --state] [-c, --context] [-a, --all]",
+                "==================================================================",
+                "  ⚙️ /aid-getopt Command Manual",
+                "==================================================================",
+                "Usage: /aid-getopt [options] [diag|test|version|help]",
+                "Aliases: /aid-getopts",
                 "Options:",
-                "  -m, --memory   Inspect state.memory structure and contents",
-                "  -i, --info     Inspect info object (model settings, maxChars, slider)",
-                "  -s, --state    Inspect active state keys and object types",
-                "  -c, --context  Inspect last model context payload received",
-                "  -a, --all      Dump full diagnostic inspection of state and info",
-                "Displays system diagnostics, active global scripts, and pipeline state."
+                "  --diag, -d     Run comprehensive runtime & state diagnostics",
+                "  --test, -t     Run in-engine automated self-diagnostic test suite",
+                "  --version, -v  Display engine build version, git commit, and runtime",
+                "  --help, -h     Display this manual",
+                "Diagnostics Sub-Flags (with --diag):",
+                "  -c, --context  Inspect model context payload received",
+                "  -m, --memory   Inspect state.memory structure",
+                "  -s, --state    Inspect active state keys and types",
+                "  -i, --info     Inspect info object (model settings, maxChars)",
+                "  -a, --all      Full diagnostic dump of state and environment",
+                "Self-Test Sub-Flags (with --test):",
+                "  --verbose      Display detailed individual test descriptions",
+                "=================================================================="
             ].join("\n");
         }
+
         const engine = (typeof globalThis !== "undefined" && (globalThis.AIDGetopt || globalThis.GetoptAID))
             ? (globalThis.AIDGetopt || globalThis.GetoptAID)
             : (typeof api !== "undefined" ? api : null);
-        const diagStr = (engine && typeof engine.diag === "function")
-            ? engine.diag()
-            : "AID-Getopt v1.0.0";
-        const modules = [];
-        if (typeof globalThis !== "undefined") {
-            if (globalThis.AIDGetopt || globalThis.GetoptAID) modules.push("AIDGetopt");
-            if (globalThis.GetoptSandbox) modules.push("GetoptSandbox");
-            if (globalThis.AutoCards) modules.push("AutoCards");
-            if (globalThis.InnerEntity || globalThis.InnerSelf) modules.push("InnerEntity");
+
+        // 2. Self-Test
+        if (flags.test || sub === "test" || sub === "selftest") {
+            if (!engine || typeof engine.selfTest !== "function") {
+                return "⚠️ AID-Getopt selfTest engine not loaded.";
+            }
+            const report = engine.selfTest({ verbose: flags.verbose || flags.v });
+            return report.formatted;
         }
 
-        const lines = [
-            "==================================================================",
-            "  ⚙️ AID-Getopt System Diagnostics",
-            "==================================================================",
-            `  Parser:     ${diagStr}`,
-            `  Lifecycle:  Multi-Tab Cooperative (Auto-Cards compatible)`,
-            `  Modules:    ${modules.length ? modules.join(", ") : "AID-Getopt Standalone"}`,
-            `  State Key:  state.GetoptSandbox`
-        ];
-
-        const st = (typeof state !== "undefined" ? state : context?.state);
-        const inf = (typeof info !== "undefined" ? info : context?.info);
-
-        const formatInspect = (label, val) => {
-            if (val === undefined) return `  ${label}: (undefined)`;
-            if (val === null) return `  ${label}: null`;
-            if (typeof val === "string") return `  ${label}: "${val}" (${val.length} chars)`;
-            if (typeof val !== "object") return `  ${label}: ${String(val)}`;
-            try {
-                const json = JSON.stringify(val, null, 2);
-                return [
-                    `  ${label}: (${Array.isArray(val) ? "Array[" + val.length + "]" : "Object"})`,
-                    ...json.split("\n").map(l => "    " + l)
-                ].join("\n");
-            } catch (_) {
-                return `  ${label}: [Object: ${Object.keys(val).join(", ")}]`;
+        // 3. Diagnostics
+        if (flags.diag || sub === "diag" || sub === "diagnostics" || flags.context || flags.memory || flags.state || flags.all) {
+            const diagStr = (engine && typeof engine.diag === "function")
+                ? engine.diag()
+                : "AID-Getopt v1.0.0";
+            const modules = [];
+            if (typeof globalThis !== "undefined") {
+                if (globalThis.AIDGetopt || globalThis.GetoptAID) modules.push("AIDGetopt");
+                if (globalThis.GetoptSandbox) modules.push("GetoptSandbox");
+                if (globalThis.AutoCards || globalThis.EntityCards) modules.push("EntityCards");
+                if (globalThis.InnerEntity || globalThis.InnerSelf) modules.push("InnerEntity");
             }
-        };
 
-        const showMemory = flags.memory || flags.all;
-        const showInfo = flags.info || flags.all;
-        const showState = flags.state || flags.all;
-        const showContext = flags.context || flags.all;
+            const lines = [
+                "==================================================================",
+                "  ⚙️ AID-Getopt System Diagnostics",
+                "==================================================================",
+                `  Parser:     ${diagStr}`,
+                `  Lifecycle:  Multi-Tab Cooperative (Auto-Cards compatible)`,
+                `  Modules:    ${modules.length ? modules.join(", ") : "AID-Getopt Standalone"}`,
+                `  State Key:  state.GetoptSandbox`
+            ];
 
-        if (showMemory) {
-            lines.push("------------------------------------------------------------------");
-            lines.push("  🧠 state.memory Inspection:");
-            if (!st) {
-                lines.push("  state: (undefined in current scope)");
-            } else {
-                lines.push(formatInspect("state.memory", st.memory));
+            const st = (typeof state !== "undefined" ? state : context?.state);
+            const inf = (typeof info !== "undefined" ? info : context?.info);
+
+            const formatInspect = (label, val) => {
+                if (val === undefined) return `  ${label}: (undefined)`;
+                if (val === null) return `  ${label}: null`;
+                if (typeof val === "string") return `  ${label}: "${val}" (${val.length} chars)`;
+                if (typeof val !== "object") return `  ${label}: ${String(val)}`;
+                try {
+                    const json = JSON.stringify(val, null, 2);
+                    return [
+                        `  ${label}: (${Array.isArray(val) ? "Array[" + val.length + "]" : "Object"})`,
+                        ...json.split("\n").map(l => "    " + l)
+                    ].join("\n");
+                } catch (_) {
+                    return `  ${label}: [Object: ${Object.keys(val).join(", ")}]`;
+                }
+            };
+
+            const showMemory = flags.memory || flags.all;
+            const showInfo = flags.info || flags.all;
+            const showState = flags.state || flags.all;
+            const showContext = flags.context || flags.all;
+
+            if (showMemory) {
+                lines.push("------------------------------------------------------------------");
+                lines.push("  🧠 state.memory Inspection:");
+                if (!st) {
+                    lines.push("  state: (undefined in current scope)");
+                } else {
+                    lines.push(formatInspect("state.memory", st.memory));
+                }
             }
-        }
 
-        if (showInfo) {
-            lines.push("------------------------------------------------------------------");
-            lines.push("  ℹ️ info Inspection (Settings & Model):");
-            if (!inf) {
-                lines.push("  info: (undefined in current scope)");
-            } else {
-                lines.push(formatInspect("info", inf));
+            if (showInfo) {
+                lines.push("------------------------------------------------------------------");
+                lines.push("  ℹ️ info Inspection (Settings & Model):");
+                if (!inf) {
+                    lines.push("  info: (undefined in current scope)");
+                } else {
+                    lines.push(formatInspect("info", inf));
+                }
             }
-        }
 
-        if (showState) {
-            lines.push("------------------------------------------------------------------");
-            lines.push("  📦 state Keys & Types:");
-            if (!st) {
-                lines.push("  state: (undefined in current scope)");
-            } else {
-                const keys = Object.keys(st);
-                lines.push(`  Keys (${keys.length}): ${keys.join(", ") || "(none)"}`);
-                for (const k of keys) {
-                    if (k !== "GetoptSandbox") {
-                        const val = st[k];
-                        const t = Array.isArray(val) ? `Array[${val.length}]` : typeof val;
-                        lines.push(`  • state.${k}: (${t})`);
+            if (showState) {
+                lines.push("------------------------------------------------------------------");
+                lines.push("  📦 state Keys & Types:");
+                if (!st) {
+                    lines.push("  state: (undefined in current scope)");
+                } else {
+                    const keys = Object.keys(st);
+                    lines.push(`  Keys (${keys.length}): ${keys.join(", ") || "(none)"}`);
+                    for (const k of keys) {
+                        if (k !== "GetoptSandbox") {
+                            const val = st[k];
+                            const t = Array.isArray(val) ? `Array[${val.length}]` : typeof val;
+                            lines.push(`  • state.${k}: (${t})`);
+                        }
                     }
                 }
             }
-        }
 
-        if (showContext) {
-            lines.push("------------------------------------------------------------------");
-            lines.push("  📜 Model Context Inspection:");
-            const ctxLen = st?.GetoptSandbox?.lastContextLength || 0;
-            const ctx = st?.GetoptSandbox?.lastContext;
-            lines.push(`  Length: ${ctxLen} chars`);
-            if (ctx) {
-                const preview = ctx.length > 400 ? ctx.slice(0, 400) + "..." : ctx;
-                lines.push("  Snippet:\n" + preview.split("\n").map(l => "    " + l).join("\n"));
-            } else {
-                lines.push("  (No model context captured yet)");
+            if (showContext) {
+                lines.push("------------------------------------------------------------------");
+                lines.push("  📜 Model Context Inspection:");
+                const ctxLen = st?.GetoptSandbox?.lastContextLength || 0;
+                const ctx = st?.GetoptSandbox?.lastContext;
+                lines.push(`  Length: ${ctxLen} chars`);
+                if (ctx) {
+                    const preview = ctx.length > 400 ? ctx.slice(0, 400) + "..." : ctx;
+                    lines.push("  Snippet:\n" + preview.split("\n").map(l => "    " + l).join("\n"));
+                } else {
+                    lines.push("  (No model context captured yet)");
+                }
             }
+
+            if (!showMemory && !showInfo && !showState && !showContext) {
+                lines.push("------------------------------------------------------------------");
+                lines.push("  Tip: Use '/aid-getopt --diag -c' to inspect context, or '-m' for memory");
+            }
+
+            lines.push("==================================================================");
+            return lines.join("\n");
         }
 
-        if (!showMemory && !showInfo && !showState && !showContext) {
-            lines.push("------------------------------------------------------------------");
-            lines.push("  Tip: Use '/diag -c' to inspect context, '/diag -m' for memory, or '/diag -h' for options");
-        }
+        // 4. Version (or default overview if no flags)
+        const infoObj = (engine && typeof engine.info === "function")
+            ? engine.info()
+            : { version: "1.0.0", gitHash: "unknown", buildTime: "unknown", environment: "AI Dungeon QuickJS" };
 
-        lines.push("==================================================================");
-        return lines.join("\n");
-    }
-});
-
-// Command 7: /test - In-Game Self-Test & Diagnostic Suite
-app.command("test", {
-    aliases: ["selftest", "check", "verify"],
-    description: "Run in-game self-diagnostic test suite verifying AID-Getopt operation on AI Dungeon",
-    options: {
-        "verbose|v": false,
-        "help|h|?": false
-    },
-    action: (flags) => {
-        if (flags.help) {
-            return [
-                "🧪 [TEST HELP]",
-                "Usage: /test [-v (verbose)]",
-                "Runs the automated self-diagnostic test suite directly inside",
-                "the AI Dungeon QuickJS environment to verify all parsers and routing."
-            ].join("\n");
-        }
-        const engine = (typeof globalThis !== "undefined" && (globalThis.AIDGetopt || globalThis.GetoptAID))
-            ? (globalThis.AIDGetopt || globalThis.GetoptAID)
-            : (typeof api !== "undefined" ? api : null);
-        if (!engine || typeof engine.selfTest !== "function") {
-            return "⚠️ AID-Getopt selfTest engine not loaded.";
-        }
-        const report = engine.selfTest({ verbose: flags.verbose });
-        return report.formatted;
+        return [
+            "==================================================================",
+            "  🎯 AID-Getopt Router & Parser Status",
+            "==================================================================",
+            `  Version:    v${infoObj.version}`,
+            `  Git Commit: ${infoObj.gitHash}`,
+            `  Build Time: ${infoObj.buildTime}`,
+            `  Runtime:    ${infoObj.environment || "AI Dungeon QuickJS"}`,
+            `  Registered: ${app.commands.size} commands configured`,
+            "------------------------------------------------------------------",
+            "  Commands:",
+            "  • Run System Diagnostics: /aid-getopt --diag (or -c for context)",
+            "  • Run Engine Self-Tests:  /aid-getopt --test",
+            "  • View All Commands:      /help",
+            "=================================================================="
+        ].join("\n");
     }
 });
 

@@ -662,6 +662,11 @@
             version: VERSION,
             gitHash: GIT_HASH,
             buildTime: BUILD_TIME,
+            author: "Randy Viosca (@Random_Variable)",
+            prefix: "/aid-getopt",
+            aliases: ["/aid-getopts"],
+            description: "POSIX/GNU option parser & multi-script slash command router",
+            helpSummary: "Router diagnostics and self-test suite (/aid-getopt --diag, /aid-getopt --test)",
             diag: getDiag
         };
         (globalThis.AID_MODULES ??= {})["aid-getopt"] = modRecord;
