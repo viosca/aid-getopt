@@ -7,7 +7,7 @@ console.log("=================================================================="
 console.log("  PART 1: SINGLE-TAB EXECUTION (sandbox-script.js)");
 console.log("==================================================================");
 
-const scriptPath = path.join(__dirname, "..", "AID-sandbox", "sandbox-script.js");
+const scriptPath = path.join(__dirname, "..", "examples", "sandbox-script.js");
 const code = fs.readFileSync(scriptPath, "utf8");
 
 const sandbox = {
@@ -133,10 +133,10 @@ console.log("  PART 2: MODULAR AUTO-CARDS ARCHITECTURE (library-sandbox.js)");
 console.log("==================================================================");
 
 {
-    const libPath = path.join(__dirname, "..", "AID-sandbox", "library-sandbox.js");
-    const inputPath = path.join(__dirname, "..", "AID-sandbox", "input.js");
-    const contextPath = path.join(__dirname, "..", "AID-sandbox", "context.js");
-    const outputPath = path.join(__dirname, "..", "AID-sandbox", "output.js");
+    const libPath = path.join(__dirname, "..", "examples", "library-sandbox.js");
+    const inputPath = path.join(__dirname, "..", "examples", "input.js");
+    const contextPath = path.join(__dirname, "..", "examples", "context.js");
+    const outputPath = path.join(__dirname, "..", "examples", "output.js");
 
     const libCode = fs.readFileSync(libPath, "utf8");
     const inputCode = fs.readFileSync(inputPath, "utf8");

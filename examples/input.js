@@ -1,16 +1,15 @@
 // ============================================================================
-// Output Modifier (AID-sandbox/output.js)
+// Input Modifier (examples/input.js)
 //
-// Paste this entire file into your scenario's "Output" tab.
-// Defensive fallback to prevent unwanted LLM text if context was bypassed.
+// Paste this entire file into your scenario's "Input" tab.
 // Requires: library-sandbox.js in the "Library" tab.
 // ============================================================================
 const modifier = (text) => {
     // If running alongside Auto-Cards or other scripts in RUN ORDER:
-    // text = AutoCards("output", text);
+    // text = AutoCards("input", text);
 
     if (typeof GetoptSandbox === "function") {
-        text = GetoptSandbox("output", text);
+        text = GetoptSandbox("input", text);
     }
     return { text };
 };

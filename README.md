@@ -297,10 +297,10 @@ npm test
 
 ## 🎮 Playable Scenario Sandbox
 
-Check out the [`AID-sandbox/`](AID-sandbox/) folder for a ready-to-play AI Dungeon scenario:
+Check out the [`examples/`](examples/) folder for a ready-to-play AI Dungeon scenario:
 - **`AI-Instruction.txt`**: Guide the AI GM to react dynamically to rolls and inventory.
 - **`Opening-Story.txt`**: Atmospheric crossroads tavern prompt with in-game command reference.
-- **`sandbox-script.js`**: Complete ready-to-paste script with `/roll`, `/inv`, `/stat`, `/test`, and `/help`.
+- **`sandbox-script.js`**: Complete ready-to-paste script with `/roll`, `/inv`, `/stat`, `/aid-getopt`, and `/help`.
 - **`README.md`**: Step-by-step instructions for standalone play or stacking in the AI Dungeon Script Loader.
 
 ---

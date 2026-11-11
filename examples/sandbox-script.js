@@ -1,36 +1,22 @@
-// ============================================================================
-//
-//                      AID-Getopt Sandbox Library
-//
-//   Build Generation: 2026-11-11 04:24:41 UTC
-//   Git Commit:       f7190f1
-//   Repository:       https://github.com/viosca/aid-getopt
-//   License:          MIT (c) Randy Viosca (@Random_Variable)
-//
-//   INSTRUCTIONS FOR AI DUNGEON:
-//   1. In scenario Scripts -> "Library" tab, paste this entire file.
-//   2. In "Input" tab:
-//        const modifier = (text) => {
-//          text = GetoptSandbox("input", text);
-//          return { text };
-//        };
-//        modifier(text);
-//   3. In "Context" tab:
-//        const modifier = (text) => {
-//          [text, stop] = GetoptSandbox("context", text, stop);
-//          return { text, stop };
-//        };
-//        modifier(text);
-//   4. In "Output" tab (optional):
-//        const modifier = (text) => {
-//          text = GetoptSandbox("output", text);
-//          return { text };
-//        };
-//        modifier(text);
-//
-//   Eliminates 100% of LLM churn on commands via Auto-Cards cooperative lifecycle!
-//
-// ============================================================================
+/**
+ * ============================================================================
+ * GetoptAID Sandbox Script for AI Dungeon
+ * ============================================================================
+ * 
+ * An interactive slash-command suite demonstrating GetoptAID in AI Dungeon:
+ * - /roll (dice roller with sides, counts, modifiers, and advantage)
+ * - /inv  (inventory manager with array accumulators and gold tracking)
+ * - /stat (character sheet with hash accumulators and trait tags)
+ * - /help (automatic manual generator)
+ * 
+ * Works identically as:
+ * 1. A standalone script in your AI Dungeon "Input" modifier tab.
+ * 2. A modular script loaded alongside other creators' scripts in the
+ *    AI Dungeon Multi-Script Pipeline (cleanly passes through unmatched input).
+ * 
+ * Author: Randy Viosca (@Random_Variable on AI Dungeon)
+ * License: MIT
+ */
 
 // ============================================================================
 // PART 1: EMBEDDED GetoptAID ENGINE (Layer 1 Parser & Layer 2 Router)
@@ -60,8 +46,8 @@
     "use strict";
 
     const VERSION = "1.0.0";
-    const GIT_HASH = "f7190f1";
-    const BUILD_TIME = "2026-11-11 04:24:41 UTC";
+    const GIT_HASH = "69e75ac";
+    const BUILD_TIME = "2026-11-11 05:09:31 UTC";
 
     /**
      * Tokenizes a command line string respecting single/double/smart quotes,
@@ -1320,3 +1306,14 @@ if (typeof globalThis !== "undefined") {
     globalThis.GetoptSandbox = GetoptSandbox;
 }
 
+// Standalone single-tab execution hook (when used directly in the Input Modifier tab)
+const modifier = (text) => {
+    text = GetoptSandbox("input", text);
+    if (typeof state !== "undefined" && state.GetoptSandbox && state.GetoptSandbox.commandOutput !== undefined) {
+        const out = state.GetoptSandbox.commandOutput;
+        delete state.GetoptSandbox.commandOutput;
+        return { text: out ? `${out.trim()}\n` : "\n" };
+    }
+    return { text };
+};
+modifier(typeof text !== "undefined" ? text : "");

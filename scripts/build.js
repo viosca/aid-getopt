@@ -9,7 +9,7 @@ const { execSync } = require("child_process");
 const ROOT_DIR = path.resolve(__dirname, "..");
 const SRC_PATH = path.join(ROOT_DIR, "src", "aid-getopt.js");
 const OUTPUT_LIB_PATH = path.join(ROOT_DIR, "library-aid-getopt.js");
-const SANDBOX_SCRIPT_PATH = path.join(ROOT_DIR, "AID-sandbox", "sandbox-script.js");
+const SANDBOX_SCRIPT_PATH = path.join(ROOT_DIR, "examples", "sandbox-script.js");
 const PKG_PATH = path.join(ROOT_DIR, "package.json");
 
 function getGitHash(dir) {
@@ -90,7 +90,7 @@ function main() {
     const libKb = (Buffer.byteLength(finalLibraryCode, "utf8") / 1024).toFixed(1);
     console.log(`   ✔ Wrote library-aid-getopt.js (${libLines.toLocaleString()} lines, ${libKb} KB)`);
 
-    // Update AID-sandbox/sandbox-script.js embedded engine if it exists
+    // Update examples/sandbox-script.js embedded engine if it exists
     if (fs.existsSync(SANDBOX_SCRIPT_PATH)) {
         let sandboxCode = fs.readFileSync(SANDBOX_SCRIPT_PATH, "utf8");
         const part1Regex = /(\/\/ =+\r?\n\/\/ PART 1: EMBEDDED (?:AID-Getopt|GetoptAID) ENGINE[\s\S]*?\r?\n\/\/ =+\r?\n)[\s\S]*?(\r?\n\/\/ =+\r?\n\/\/ PART 2: COMMAND DEFINITIONS)/;
@@ -100,13 +100,13 @@ function main() {
             try {
                 new vm.Script(sandboxCode);
                 fs.writeFileSync(SANDBOX_SCRIPT_PATH, sandboxCode, "utf8");
-                console.log("   ✔ Synchronized stamped engine into AID-sandbox/sandbox-script.js");
+                console.log("   ✔ Synchronized stamped engine into examples/sandbox-script.js");
             } catch (err) {
                 console.error("   ⚠️ Could not sync sandbox-script.js syntax:", err);
             }
         }
 
-        // Generate AID-sandbox/library-sandbox.js (for Shared Library tab)
+        // Generate examples/library-sandbox.js (for Shared Library tab)
         const trailingHookRegex = /\r?\n\/\/ Standalone single-tab execution hook[\s\S]*$/;
         let libSandboxCode = sandboxCode.replace(trailingHookRegex, "\n");
 
@@ -149,11 +149,11 @@ function main() {
 
         try {
             new vm.Script(libSandboxCode);
-            const SANDBOX_LIB_PATH = path.join(ROOT_DIR, "AID-sandbox", "library-sandbox.js");
+            const SANDBOX_LIB_PATH = path.join(ROOT_DIR, "examples", "library-sandbox.js");
             fs.writeFileSync(SANDBOX_LIB_PATH, libSandboxCode, "utf8");
             const sLines = libSandboxCode.split("\n").length;
             const sKb = (Buffer.byteLength(libSandboxCode, "utf8") / 1024).toFixed(1);
-            console.log(`   ✔ Wrote AID-sandbox/library-sandbox.js (${sLines.toLocaleString()} lines, ${sKb} KB)`);
+            console.log(`   ✔ Wrote examples/library-sandbox.js (${sLines.toLocaleString()} lines, ${sKb} KB)`);
         } catch (err) {
             console.error("   ⚠️ Could not validate library-sandbox.js syntax:", err);
         }

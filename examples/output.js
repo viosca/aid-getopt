@@ -1,17 +1,17 @@
 // ============================================================================
-// Context Modifier (AID-sandbox/context.js)
+// Output Modifier (examples/output.js)
 //
-// Paste this entire file into your scenario's "Context" tab.
-// Halts the AI model on command turns to eliminate 100% of LLM churn!
+// Paste this entire file into your scenario's "Output" tab.
+// Defensive fallback to prevent unwanted LLM text if context was bypassed.
 // Requires: library-sandbox.js in the "Library" tab.
 // ============================================================================
 const modifier = (text) => {
     // If running alongside Auto-Cards or other scripts in RUN ORDER:
-    // [text, stop] = AutoCards("context", text, stop);
+    // text = AutoCards("output", text);
 
     if (typeof GetoptSandbox === "function") {
-        [text, stop] = GetoptSandbox("context", text, stop);
+        text = GetoptSandbox("output", text);
     }
-    return { text, stop };
+    return { text };
 };
 modifier(text);
